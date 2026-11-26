@@ -27,9 +27,11 @@ export const site = {
     instagram: 'https://www.instagram.com/Nexclima.us',
   },
   reviewsUrl: 'https://www.google.com/search?q=NexClima+Inc+La+Vergne+TN+reviews',
-  // Destino del formulario. Vacío = Netlify Forms (si alojas en Netlify).
-  // Para otro hosting usa p. ej. https://formspree.io/f/XXXX
-  formEndpoint: '',
+  // Destino del formulario: la función de Netlify que filtra el spam (netlify/functions/lead.mjs).
+  // Los leads buenos llegan a Netlify Forms (formulario «lead-verified») con aviso por correo.
+  formEndpoint: '/api/lead',
+  // Housecall Pro: widget de reservas online (identificador público, ya visible en la web actual).
+  hcp: { token: '24d4fbcb0c6c4212a1c0480e124b8689', org: 'Nexclima-Inc' },
   // ID de Google Analytics 4 (G-XXXX). Vacío = no se carga nada.
   ga4: '',
   // --- Pruebas de confianza: solo se muestran si tienen valor (nunca inventar) ---

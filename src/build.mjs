@@ -61,6 +61,8 @@ const I = {
   ok: '<circle cx="12" cy="12" r="10"/><path class="draw" d="m7 12.5 3.2 3.2L17 9"/>',
 };
 const icon = (n, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${extra}>${I[n]}</svg>`;
+// Botón que abre la reserva online de Housecall Pro (si el widget no carga, baja al formulario).
+const book = (label, cls = 'btn btn-sun', loc = 'header') => `<a class="${cls}" href="#book" data-hcp-booking="true" data-loc="${loc}">${label}</a>`;
 const logoImg = (h = 46, lazy = false) => `<img src="/img/logo-48.webp" srcset="/img/logo-48.webp 1x, /img/logo-96.webp 2x" width="${Math.round(h * 386 / 96)}" height="${h}" alt="NexClima Inc"${lazy ? ' loading="lazy"' : ''}>`;
 
 // ---------- Pruebas de confianza (solo datos confirmados) ----------
@@ -98,24 +100,23 @@ function hero({ img = 'hero', eyebrow = '', crumbs = '', h1, lead, ticks = [], c
 }
 
 function quoteBar({ title = 'Request service', city = '' } = {}) {
-  const endpoint = site.formEndpoint || '/';
-  const netlify = site.formEndpoint ? '' : ' data-netlify="true" netlify-honeypot="bot-field"';
+  const endpoint = site.formEndpoint || '/api/lead';
   const cityOpts = ['', ...cityList, 'Other'].map((c) => `<option value="${esc(c)}"${c === city ? ' selected' : ''}>${c ? esc(c) : 'Select city'}</option>`).join('');
   const issueOpts = ['', ...issues].map((x) => `<option value="${esc(x)}">${x ? esc(x) : 'Choose one'}</option>`).join('');
   return `<div class="quote-wrap wrap motion-safe:animate-rise [animation-delay:380ms]" id="book"><div class="quote">
   <div class="quote-head"><h2>${esc(title)}</h2><p>${esc(afterSend)} No obligation.</p></div>
-  <form name="lead" method="POST" action="${site.formEndpoint || '/thank-you/'}"${netlify} data-endpoint="${endpoint}" data-tel="${site.phoneHref}" data-phone="${site.phone}" novalidate>
-    <input type="hidden" name="form-name" value="lead">
+  <form name="lead" method="POST" action="${endpoint}" data-endpoint="${endpoint}" data-tel="${site.phoneHref}" data-phone="${site.phone}" novalidate>
+    <input type="hidden" name="e" value="">
     <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
     <div class="qgrid">
       <div class="field"><label for="q-issue">What’s going on?</label><select id="q-issue" name="issue" required>${issueOpts}</select><span class="err">Choose the closest option.</span></div>
       <div class="field"><label for="q-name">Your name</label><input id="q-name" name="name" autocomplete="name" required><span class="err">Enter your name.</span></div>
-      <div class="field"><label for="q-phone">Mobile phone</label><input id="q-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="(615) 555-0123"><span class="err">Enter a 10-digit number.</span></div>
+      <div class="field"><label for="q-phone">Mobile phone</label><input id="q-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="(615) 555-0123"><span class="err">Enter a valid US mobile number.</span></div>
       <div class="field"><label for="q-city">City</label><select id="q-city" name="city" autocomplete="address-level2">${cityOpts}</select></div>
       <button type="submit" class="btn btn-sun">Request service</button>
     </div>
     <div class="form-msg" role="alert"></div>
-    <p class="form-note">We never share your number · <a href="/privacy-policy/">Privacy</a> · Prefer to talk? <a href="${site.phoneHref}" data-loc="form">${site.phone}</a> or <a href="${site.whatsapp}" data-loc="form" rel="noopener">WhatsApp</a></p>
+    <p class="form-note">Want to pick a time yourself? <a href="#book" data-hcp-booking="true" data-loc="form">Book online</a> · We never share your number · <a href="/privacy-policy/">Privacy</a> · Prefer to talk? <a href="${site.phoneHref}" data-loc="form">${site.phone}</a> or <a href="${site.whatsapp}" data-loc="form" rel="noopener">WhatsApp</a></p>
   </form>
   <div class="thanks" role="status">${icon('ok')}<div><h3>Request received</h3><p>${esc(afterSend)} If it’s urgent, call <a href="${site.phoneHref}">${site.phone}</a>.</p></div></div>
 </div></div>`;
@@ -174,6 +175,7 @@ ${animBoot}
 <style>${css}</style>
 <script type="application/ld+json">${JSON.stringify(graph)}</script>
 ${ga}
+<script>window.HCP_SRC=${JSON.stringify(`https://online-booking.housecallpro.com/script.js?token=${site.hcp.token}&orgName=${site.hcp.org}`)}</script>
 <script src="/app.js" defer></script>
 </head>
 <body>
@@ -182,7 +184,7 @@ ${ga}
 <header class="site-head"><div class="wrap">
   <a class="logo" href="/" aria-label="NexClima home">${logoImg()}</a>
   <nav class="nav" id="nav" aria-label="Main">${navItems.map(([n, s]) => `<a href="${url(s)}"${s === slug ? ' aria-current="page"' : ''}>${n}</a>`).join('')}</nav>
-  <div class="head-cta"><a class="head-phone" href="${site.phoneHref}" data-loc="header">${icon('phone')}<span>${site.phone}</span></a><a class="btn btn-sun" href="#book">Book service</a></div>
+  <div class="head-cta"><a class="head-phone" href="${site.phoneHref}" data-loc="header">${icon('phone')}<span>${site.phone}</span></a>${book('Book service')}</div>
   <button class="menu-btn" aria-controls="nav" aria-expanded="false" aria-label="Open menu">${icon('menu')}</button>
 </div></header>
 <main id="main">
@@ -201,7 +203,7 @@ ${body}
   </div>
   <div class="legal"><span>© ${new Date().getFullYear()} ${esc(site.legalName)}. All rights reserved.</span><span>Residential HVAC only · ${esc(site.city)}, Tennessee</span></div>
 </div></footer>
-${mbar ? `<div class="mbar motion-safe:animate-slide-up"><a class="btn btn-ghost ring-icon" href="${site.phoneHref}" data-loc="mobilebar">${icon('phone')} Call now</a><a class="btn btn-sun" href="#book">Book service</a></div>` : ''}
+${mbar ? `<div class="mbar motion-safe:animate-slide-up"><a class="btn btn-ghost ring-icon" href="${site.phoneHref}" data-loc="mobilebar">${icon('phone')} Call now</a>${book('Book service', 'btn btn-sun', 'mobilebar')}</a></div>` : ''}
 </body>
 </html>`;
 }
@@ -238,7 +240,7 @@ const faqBlock = (faq, title = 'Frequently asked questions') => `<section class=
 
 const ctaBand = (h = 'Need heat or AC fixed?', p = `Call ${site.phone} or book online. We serve ${cityText}.`) => `<section class="cta-band on-dark"><div class="wrap" data-reveal>
   <div><h2>${esc(h)}</h2><p>${esc(p)}</p></div>
-  <div class="acts"><a class="btn btn-sun" href="${site.phoneHref}" data-loc="cta">${icon('phone')} Call ${site.phone}</a><a class="btn btn-ghost" href="#book">Book online</a></div>
+  <div class="acts"><a class="btn btn-sun" href="${site.phoneHref}" data-loc="cta">${icon('phone')} Call ${site.phone}</a>${book('Book online', 'btn btn-ghost', 'cta')}</div>
 </div></section>`;
 
 const pages = [];
@@ -255,7 +257,7 @@ ${proofStrip()}
   ${serviceCards()}
 </div></section>
 <section class="sec soft"><div class="wrap split">
-  ${head('Sound familiar?', 'These are the calls we get most. If one of them is happening at your house, a technician can usually find the cause in one visit.', '<a class="btn btn-sun" href="#book">Book a diagnosis</a>')}
+  ${head('Sound familiar?', 'These are the calls we get most. If one of them is happening at your house, a technician can usually find the cause in one visit.', book('Book a diagnosis', 'btn btn-sun', 'signs'))}
   <ul class="signs" data-stagger>${['AC running, but blowing warm air', 'Heat pump covered in ice', 'Water leaking under the indoor unit', 'Some rooms always hot or cold', 'Strange noise or smell from the vents', 'Power bill higher than last year'].map((x) => `<li>${x}</li>`).join('')}</ul>
 </div></section>
 ${howItWorks()}
@@ -302,7 +304,7 @@ for (const s of services) {
 ${hero({ img: svcImg[s.slug], crumbs: `<a href="/">Home</a> / <a href="/hvac-services/">HVAC services</a> / ${s.short}`, h1: esc(s.h1), lead: esc(s.lead), ticks: ['Local technicians based in La Vergne', 'The price explained before work starts'] })}
 ${quoteBar({ title: `Book ${s.short.toLowerCase()}` })}
 <section class="sec soft first"><div class="wrap split">
-  ${head(`Signs you need ${s.short.toLowerCase()}`, 'If you notice any of these, call before a small problem becomes an expensive one.', '<a class="btn btn-sun" href="#book">Book a visit</a>')}
+  ${head(`Signs you need ${s.short.toLowerCase()}`, 'If you notice any of these, call before a small problem becomes an expensive one.', book('Book a visit', 'btn btn-sun', 'signs'))}
   <ul class="signs" data-stagger>${s.signs.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
 </div></section>
 <section class="sec"><div class="wrap">
@@ -407,7 +409,7 @@ add('specials', layout({
   ld: [crumbsLd([['Home', ''], ['Specials', 'specials']])],
   body: `${hero({ img: 'svc-maintenance', crumbs: '<a href="/">Home</a> / Specials', h1: 'Current HVAC offers', lead: 'Mention the offer when you call or in the form.', call: false })}
   ${quoteBar()}
-  <section class="sec first"><div class="wrap"><div class="grid g2" data-stagger>${specials.map((o) => `<div class="offer"><h2 style="font-size:1.4rem">${esc(o.title)}</h2><p class="price">${esc(o.price)} ${o.was ? `<s>${esc(o.was)}</s>` : ''}</p><p>${esc(o.text)}</p><a class="btn btn-sun" href="#book">Claim this offer</a></div>`).join('')}</div></div></section>`,
+  <section class="sec first"><div class="wrap"><div class="grid g2" data-stagger>${specials.map((o) => `<div class="offer"><h2 style="font-size:1.4rem">${esc(o.title)}</h2><p class="price">${esc(o.price)} ${o.was ? `<s>${esc(o.was)}</s>` : ''}</p><p>${esc(o.text)}</p>${book('Claim this offer', 'btn btn-sun', 'specials')}</div>`).join('')}</div></div></section>`,
 }), { sitemap: specialsConfirmed, priority: '0.5' });
 
 // ---------- Privacidad ----------
@@ -436,9 +438,16 @@ for (const p of pages) {
 writeFileSync(join(out, '404.html'), layout({ slug: '404', title: 'Page not found | NexClima', desc: 'Page not found.', noindex: true,
   body: `<section class="sec"><div class="wrap prose"><h1>We couldn’t find that page</h1><p>Need heating or AC help? Call <a href="${site.phoneHref}">${site.phone}</a> or start from our <a href="/">home page</a>.</p></div></section>` }));
 
+// Formulario oculto para que Netlify registre «lead-verified» (la función reenvía aquí los leads buenos).
+mkdirSync(join(out, 'forms'), { recursive: true });
+writeFileSync(join(out, 'forms/lead-verified.html'), `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Form</title></head><body>
+<form name="lead-verified" method="POST" data-netlify="true" hidden>
+${['issue', 'name', 'phone', 'city', 'page', 'utm_source', 'utm_medium', 'utm_campaign', 'gclid'].map((n) => `<input name="${n}">`).join('')}
+</form></body></html>`);
+
 const today = new Date().toISOString().slice(0, 10);
 writeFileSync(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.filter((p) => p.sitemap).map((p) => `<url><loc>${abs(p.slug)}</loc><lastmod>${today}</lastmod><priority>${p.priority}</priority></url>`).join('\n')}\n</urlset>\n`);
-writeFileSync(join(out, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /thank-you/\n\nSitemap: ${site.url}/sitemap.xml\n`);
+writeFileSync(join(out, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /thank-you/\nDisallow: /forms/\n\nSitemap: ${site.url}/sitemap.xml\n`);
 writeFileSync(join(out, '_headers'), `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/app.js\n  Cache-Control: public, max-age=604800\n/img/*\n  Cache-Control: public, max-age=31536000, immutable\n/og.jpg\n  Cache-Control: public, max-age=2592000\n`);
 writeFileSync(join(out, '_redirects'), `/careers/  /contact-us/  301\n/home/  /  301\n/wp-admin/*  /  301\n/wp-login.php  /  301\n/feed/  /  301\n`);
 

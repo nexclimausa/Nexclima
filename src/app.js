@@ -1,6 +1,7 @@
 // Comportamiento del sitio. esbuild lo empaqueta con Motion (solo lo que se usa) en dist/app.js.
 import { animate } from 'motion/mini';
 import { inView } from 'motion';
+import { validUsPhone, normalizePhone, validName } from './lead-rules.mjs';
 
 const d = document;
 const root = d.documentElement;
@@ -74,7 +75,7 @@ d.addEventListener('click', (e) => {
 });
 
 // ---------- Formulario ----------
-const phoneRe = /^\D*(\+?1)?\D*(\d\D*){10}$/;
+const loadedAt = performance.now();
 d.querySelectorAll('.quote').forEach((box) => {
   const form = box.querySelector('form');
   if (!form) return;
@@ -95,12 +96,13 @@ d.querySelectorAll('.quote').forEach((box) => {
     const issue = form.elements.issue.value;
     const name = form.elements.name.value.trim();
     const phone = form.elements.phone.value.trim();
-    const bad = { issue: !issue, name: name.length < 2, phone: !phoneRe.test(phone) };
+    const bad = { issue: !issue, name: !validName(name), phone: !validUsPhone(normalizePhone(phone)) };
     Object.entries(bad).forEach(([k, v]) => setErr(k, v));
     const first = Object.keys(bad).find((k) => bad[k]);
     if (first) { form.elements[first].focus(); return; }
 
     const data = new FormData(form);
+    data.set('e', String(Math.round(performance.now() - loadedAt)));
     data.set('page', location.pathname);
     const qs = new URLSearchParams(location.search);
     ['utm_source', 'utm_medium', 'utm_campaign', 'gclid'].forEach((k) => { if (qs.get(k)) data.set(k, qs.get(k)); });
@@ -109,11 +111,12 @@ d.querySelectorAll('.quote').forEach((box) => {
     const label = sbtn.textContent;
     sbtn.disabled = true; sbtn.textContent = 'Sending…';
     msg.className = 'form-msg'; msg.textContent = '';
-    const endpoint = form.dataset.endpoint || '/';
-    const opts = endpoint === '/'
-      ? { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data).toString() }
-      : { method: 'POST', headers: { Accept: 'application/json' }, body: data };
-    fetch(endpoint, opts).then((r) => {
+    const endpoint = form.dataset.endpoint || '/api/lead';
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(data).toString(),
+    }).then((r) => {
       if (!r.ok) throw new Error(String(r.status));
       track('generate_lead', { issue, city: data.get('city') || '' });
       box.classList.add('done');
@@ -130,4 +133,49 @@ d.querySelectorAll('.quote').forEach((box) => {
       if (!reduce) animate(msg, { opacity: [0, 1], transform: ['translateY(-6px)', 'translateY(0)'] }, { duration: 0.4, ease: EASE });
     }).finally(() => { sbtn.disabled = false; sbtn.textContent = label; });
   });
+});
+
+// ---------- Reserva online (Housecall Pro) ----------
+// El widget (~5 KB) se carga cuando la página ya está lista o al primer gesto, nunca antes del contenido.
+let hcpState = 0; // 0 sin cargar, 1 cargando, 2 listo
+const hcpWaiters = [];
+function loadHcp() {
+  if (hcpState || !window.HCP_SRC) return;
+  hcpState = 1;
+  const s = d.createElement('script');
+  s.src = window.HCP_SRC; s.async = true;
+  s.onload = () => { hcpState = 2; hcpWaiters.splice(0).forEach((f) => f()); };
+  s.onerror = () => { hcpState = 0; hcpWaiters.splice(0).forEach((f) => f(true)); };
+  d.head.appendChild(s);
+}
+const idle = window.requestIdleCallback || ((f) => setTimeout(f, 2500));
+addEventListener('load', () => idle(loadHcp, { timeout: 4000 }));
+['pointerdown', 'keydown', 'touchstart'].forEach((ev) => addEventListener(ev, loadHcp, { once: true, passive: true }));
+
+function toForm() {
+  const f = d.getElementById('book');
+  if (f) { f.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); const i = f.querySelector('select, input'); if (i) setTimeout(() => i.focus({ preventScroll: true }), 500); }
+}
+function openBooking(loc) {
+  const open = (failed) => {
+    if (!failed && window.HCPWidget && typeof window.HCPWidget.openModal === 'function') {
+      window.HCPWidget.openModal();
+      track('booking_open', { location: loc });
+    } else {
+      track('booking_fallback', { location: loc });
+      toForm();
+    }
+  };
+  if (hcpState === 2) return open();
+  let done = false;
+  const once = (f) => { if (!done) { done = true; open(f); } };
+  hcpWaiters.push(once);
+  setTimeout(() => once(true), 4000);
+  loadHcp();
+}
+d.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('[data-hcp-booking="true"]');
+  if (!b) return;
+  e.preventDefault();
+  openBooking(b.dataset.loc || 'page');
 });
