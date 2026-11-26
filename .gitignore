@@ -1,0 +1,10 @@
+.env
+.env.*
+.taste-skill/
+shots/
+node_modules/
+.tmp/
+dist/
+Dashboard*.html
+.DS_Store
+src/og 2.html

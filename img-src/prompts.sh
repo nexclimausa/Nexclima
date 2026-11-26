@@ -1,0 +1,9 @@
+#!/bin/zsh
+cd "$(dirname $0)/.."
+S="Photorealistic documentary-style photograph, natural colors, shot on a 35mm lens. Late-afternoon summer light coming from the left, one consistent sun direction, soft shadows falling to the right. Any person wears a plain navy work shirt with no logos or text and is seen from behind or only as hands; no faces. No brand names, no logos, no text, no watermarks."
+g(){ node src/gemini-image.mjs --model gemini-3-pro-image --name "$1" --aspect "$2" --prompt "$3 $S"; }
+g svc-ac 4:3 "Close-up of a technician's gloved hands using a digital multimeter to test a run capacitor inside the open electrical service panel of an outdoor residential air conditioner condenser, beside a red-brick house in Middle Tennessee, green shrubs softly blurred behind."
+g svc-heating 4:3 "Inside a clean residential utility closet, a technician kneels in front of an open modern gas furnace and inspects the burner area with a small flashlight; warm daylight enters from a window on the left; tidy space, white walls, a pleated filter visible."
+g svc-maintenance 4:3 "A technician seen from behind gently rinses the coil fins of an outdoor heat pump condenser with a garden hose spray nozzle, next to a light-colored siding suburban home in Middle Tennessee, mulch bed and green lawn, water droplets catching the sunlight."
+g svc-replacement 4:3 "A brand-new outdoor heat pump unit on a fresh clean concrete pad, new insulated copper line set neatly strapped to the wall, beside a modern white farmhouse-style suburban home in Middle Tennessee with dark window trim, freshly mulched bed, no people."
+g about 4:3 "A technician seen from behind carrying a tool bag walks up the driveway toward the front door of a two-story brick suburban home in Middle Tennessee; a plain white work van with no markings is parked in the driveway; mature trees, green lawn, welcoming neighborhood feel."
