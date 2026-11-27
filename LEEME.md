@@ -34,14 +34,14 @@ unos 310-400 KB en unas 10 peticiones, fotos incluidas (el sitio actual pesa uno
 
 ## PENDIENTE DE CONFIRMAR con NexClima (en `src/data.mjs`)
 Nada de esto se muestra hasta que tenga un valor real:
-1. Valoración y número de reseñas de Google (`googleRating`, `googleReviewCount`).
+1. ~~Valoración y número de reseñas de Google~~: hecho (5.0, 14 reseñas, sacado del Perfil de Empresa). Actualízalo de vez en cuando.
 2. Precio del diagnóstico y si se descuenta al reparar (`diagnosticPrice`, `diagnosticWaived`).
 3. Licencia de Tennessee (`license`), garantía (`warranty`) y tiempo de respuesta (`responseTime`).
-4. Horario real (`hours` + `hoursConfirmed: true`).
+4. ~~Horario~~: hecho (lunes a sábado, 8:00-17:00, igual que en Google).
 5. Ofertas vigentes (`specials` + `specialsConfirmed: true`); hasta entonces /specials/ no sale en el menú.
 6. Correo con dominio propio (service@nexclima.us) en lugar del Gmail.
 7. ID de GA4 (`ga4`).
-8. Fotos reales del equipo y de trabajos: las actuales son de ambientación hechas con IA (`img-src/`).
+8. Fotos: ya se usan las de NexClima («Imagenes a Usar», con nombres descriptivos en `img-src/`). La del técnico junto al equipo es real; el resto son de ambientación.
 9. Que se explique el precio antes de empezar cualquier trabajo (aparece en los puntos destacados).
 
 ## Siguientes fases (según la auditoría)

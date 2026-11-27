@@ -14,19 +14,18 @@ export const site = {
   city: 'La Vergne',
   region: 'TN',
   zip: '37086',
-  // CONFIRMAR: horario real (debe coincidir con el Perfil de Empresa de Google).
+  // Horario tal como está en el Perfil de Empresa de Google (comprobado el 27-11-2026). Si cambia allí, cámbialo aquí.
   hours: [
-    { days: 'Monday – Friday', time: '7:00 AM – 6:00 PM', schema: 'Mo-Fr 07:00-18:00' },
-    { days: 'Saturday', time: '8:00 AM – 2:00 PM', schema: 'Sa 08:00-14:00' },
+    { days: 'Monday – Saturday', time: '8:00 AM – 5:00 PM', schema: 'Mo-Sa 08:00-17:00' },
   ],
-  hoursConfirmed: false, // pon true cuando el horario esté confirmado (si es false no se publica)
+  hoursConfirmed: true,
   founders: ['Willmer Vasquez', 'Maiker Briceño'],
   homeownersServed: '200+',
   social: {
     facebook: 'https://www.facebook.com/nexclima.us',
     instagram: 'https://www.instagram.com/Nexclima.us',
   },
-  reviewsUrl: 'https://www.google.com/search?q=NexClima+Inc+La+Vergne+TN+reviews',
+  reviewsUrl: 'https://maps.google.com/?cid=15340710423373047795', // ficha de Google de Nexclima Inc
   // Destino del formulario: la función de Netlify que filtra el spam (netlify/functions/lead.mjs).
   // Los leads buenos llegan a Netlify Forms (formulario «lead-verified») con aviso por correo.
   formEndpoint: '/api/lead',
@@ -35,8 +34,8 @@ export const site = {
   // ID de Google Analytics 4 (G-XXXX). Vacío = no se carga nada.
   ga4: '',
   // --- Pruebas de confianza: solo se muestran si tienen valor (nunca inventar) ---
-  googleRating: null,       // CONFIRMAR, p. ej. 5.0
-  googleReviewCount: null,  // CONFIRMAR, p. ej. 23
+  googleRating: '5.0',      // Perfil de Empresa de Google, comprobado el 27-11-2026 (actualízalo de vez en cuando)
+  googleReviewCount: 14,    // idem
   diagnosticPrice: null,    // CONFIRMAR, p. ej. '$79' (decisión comercial)
   diagnosticWaived: false,  // true si el diagnóstico se descuenta al reparar
   license: null,            // CONFIRMAR, p. ej. 'TN License #12345'

@@ -30,17 +30,24 @@ const cityText = 'Nashville, Smyrna, La Vergne, Murfreesboro, Franklin, Brentwoo
 
 // ---------- Imágenes ----------
 // Imágenes de ambientación generadas con IA (Gemini). Sustituir por fotos reales de NexClima cuando existan.
+// Fotos: «file» es el nombre del archivo en /img/ (descriptivo, ayuda al SEO). «card» = tiene recorte 4:3 para tarjetas.
 const IMG = {
-  hero: { w: [640, 1024, 1376], ratio: [1376, 768], alt: 'HVAC technician checking a heat pump outside a brick home in Middle Tennessee', pos: '70% 40%' },
-  about: { w: [640, 1024], ratio: [1024, 765], alt: 'HVAC technician walking up to a brick home in Middle Tennessee', pos: '62% 50%' },
-  'svc-ac': { w: [480, 800, 1200], ratio: [1200, 896], alt: 'Technician testing an air conditioner capacitor with a multimeter', pos: '55% 50%' },
-  'svc-heating': { w: [480, 800, 1200], ratio: [1200, 896], alt: 'Technician inspecting a gas furnace in a home utility closet', pos: '72% 45%' },
-  'svc-maintenance': { w: [480, 800, 1200], ratio: [1200, 896], alt: 'Technician rinsing the coil of an outdoor heat pump during a tune-up', pos: '62% 55%' },
-  'svc-replacement': { w: [480, 800, 1200], ratio: [1200, 896], alt: 'New heat pump installed on a clean pad beside a white home', pos: '45% 60%' },
+  hero: { file: 'hvac-technician-ac-repair-middle-tennessee', w: [640, 1024, 1376], ratio: [1376, 768], alt: 'HVAC technician repairing an outdoor AC unit beside a brick home, with a NexClima service van in the driveway', pos: '62% 50%' },
+  about: { file: 'nexclima-hvac-technician-la-vergne-tn', w: [640, 1024, 1376], ratio: [1376, 917], alt: 'NexClima HVAC technician next to the outdoor AC unit of a Middle Tennessee home', pos: '72% 35%' },
+  visit: { file: 'hvac-service-visit-homeowner-tennessee', w: [640, 1024, 1376], ratio: [1376, 917], alt: 'HVAC technician greeting a homeowner at her front porch, with a NexClima van parked outside', pos: '62% 50%' },
+  nashville: { file: 'nashville-tn-skyline', w: [640, 1024, 1376], ratio: [1376, 771], alt: 'Nashville, Tennessee skyline at dusk', pos: '60% 50%' },
+  'svc-ac': { file: 'central-air-conditioning-home-cooling', w: [640, 1024, 1376], ratio: [1376, 562], card: true, alt: 'Family relaxing in a cool, bright living room while the central air conditioning runs', pos: '55% 50%' },
+  'svc-heating': { file: 'furnace-heating-repair-technician', w: [480, 800, 1200], ratio: [1200, 896], card: true, alt: 'Technician inspecting a gas furnace in a home utility closet', pos: '72% 45%' },
+  'svc-maintenance': { file: 'hvac-tune-up-air-filter-change', w: [640, 1024, 1326], ratio: [1326, 768], card: true, alt: 'HVAC technician replacing a return air filter during a home tune-up', pos: '45% 40%' },
+  'svc-replacement': { file: 'new-heat-pump-installation-home', w: [480, 800, 1200], ratio: [1200, 896], card: true, alt: 'New heat pump installed on a clean pad beside a white home', pos: '45% 60%' },
 };
-const srcset = (n) => IMG[n].w.map((w) => `/img/${n}-${w}.webp ${w}w`).join(', ');
-const largest = (n) => `/img/${n}-${IMG[n].w.at(-1)}.webp`;
-const pic = (n, sizes, extra = '') => `<img src="/img/${n}-${IMG[n].w[1] || IMG[n].w[0]}.webp" srcset="${srcset(n)}" sizes="${sizes}" width="${IMG[n].ratio[0]}" height="${IMG[n].ratio[1]}" alt="${esc(IMG[n].alt)}" loading="lazy" decoding="async"${extra}>`;
+const srcset = (n) => IMG[n].w.map((w) => `/img/${IMG[n].file}-${w}.webp ${w}w`).join(', ');
+const largest = (n) => `/img/${IMG[n].file}-${IMG[n].w.at(-1)}.webp`;
+const pic = (n, sizes, extra = '') => `<img src="/img/${IMG[n].file}-${IMG[n].w[1] || IMG[n].w[0]}.webp" srcset="${srcset(n)}" sizes="${sizes}" width="${IMG[n].ratio[0]}" height="${IMG[n].ratio[1]}" alt="${esc(IMG[n].alt)}" loading="lazy" decoding="async"${extra}>`;
+// Tarjetas 4:3: usan el recorte «card» para que no se vean borrosas.
+const cardPic = (n, sizes) => IMG[n].card
+  ? `<img src="/img/${IMG[n].file}-card-480.webp" srcset="/img/${IMG[n].file}-card-480.webp 480w, /img/${IMG[n].file}-card-800.webp 800w" sizes="${sizes}" width="800" height="600" alt="${esc(IMG[n].alt)}" loading="lazy" decoding="async">`
+  : pic(n, sizes);
 const svcImg = { [services[0].slug]: 'svc-ac', [services[1].slug]: 'svc-heating', [services[2].slug]: 'svc-maintenance', [services[3].slug]: 'svc-replacement' };
 
 // ---------- Iconos (SVG en línea, sin peticiones) ----------
@@ -218,7 +225,7 @@ const proofStrip = () => `<section class="proof" aria-label="Why homeowners choo
 
 const head = (h2, p = '', extra = '') => `<div class="sec-head" data-reveal><h2>${h2}</h2>${p ? `<p>${p}</p>` : ''}${extra}</div>`;
 
-const serviceCards = (list = services, h = 'h3') => `<div class="grid ${list.length === 4 ? 'g4' : 'g3'}" data-stagger>${list.map((s) => `<a class="card pic" href="${url(s.slug)}"><span class="ph">${pic(svcImg[s.slug], '(max-width: 620px) 92vw, (max-width: 1000px) 46vw, 280px')}</span><span class="cb"><${h}>${s.short}</${h}><p>${esc(s.card)}</p><span class="more">${s.short} details <i>→</i></span></span></a>`).join('')}</div>`;
+const serviceCards = (list = services, h = 'h3') => `<div class="grid ${list.length === 4 ? 'g4' : 'g3'}" data-stagger>${list.map((s) => `<a class="card pic" href="${url(s.slug)}"><span class="ph">${cardPic(svcImg[s.slug], '(max-width: 620px) 92vw, (max-width: 1000px) 46vw, 280px')}</span><span class="cb"><${h}>${s.short}</${h}><p>${esc(s.card)}</p><span class="more">${s.short} details <i>→</i></span></span></a>`).join('')}</div>`;
 
 const reviewGrid = (list = reviews) => `<div class="grid g2" data-stagger>${list.map((r) => `<figure class="review"><b class="st" aria-label="5 out of 5 stars">★★★★★</b><blockquote><p>“${esc(r.text)}”</p></blockquote><figcaption>${esc(r.name)}<span>Google review · ${esc(r.tag)}</span></figcaption></figure>`).join('')}</div>`;
 
@@ -325,10 +332,10 @@ ${ctaBand()}`;
 
 // ---------- Hub de zonas ----------
 add('service-areas', layout({
-  slug: 'service-areas', heroImg: 'about', title: 'HVAC Service Areas in Middle Tennessee | NexClima',
+  slug: 'service-areas', heroImg: 'visit', title: 'HVAC Service Areas in Middle Tennessee | NexClima',
   desc: `NexClima provides residential heating and AC service in ${cityText}, TN. Find your city.`,
   ld: [crumbsLd([['Home', ''], ['Service areas', 'service-areas']])],
-  body: `${hero({ img: 'about', crumbs: '<a href="/">Home</a> / Service areas', h1: 'HVAC service areas in Middle Tennessee', lead: 'From our shop on Murfreesboro Road in La Vergne we serve eight cities across Rutherford, Davidson, Williamson and Wilson counties.' })}
+  body: `${hero({ img: 'visit', crumbs: '<a href="/">Home</a> / Service areas', h1: 'HVAC service areas in Middle Tennessee', lead: 'From our shop on Murfreesboro Road in La Vergne we serve eight cities across Rutherford, Davidson, Williamson and Wilson counties.' })}
   ${quoteBar()}
   <section class="sec first"><div class="wrap">${head('Choose your city')}
   <div class="grid g2" data-stagger>${cities.map((c) => `<a class="card" href="${url(c.slug)}"><h3>${c.name}, TN</h3><p>${esc(c.drive)}. ZIP ${c.zips.join(', ')}.</p><span class="more">HVAC in ${c.name} <i>→</i></span></a>`).join('')}</div></div></section>
@@ -336,9 +343,11 @@ add('service-areas', layout({
 }), { priority: '0.8' });
 
 // ---------- Páginas de ciudad ----------
-const cityImgs = ['hero', 'about', 'svc-replacement', 'svc-maintenance'];
+// Foto de cada ciudad: Nashville tiene la suya; el resto rota para que no se repita la misma.
+const cityImgs = ['visit', 'hero', 'about', 'svc-maintenance'];
+const cityImgFor = { Nashville: 'nashville' };
 cities.forEach((c, ci) => {
-  const img = cityImgs[ci % cityImgs.length];
+  const img = cityImgFor[c.name] || cityImgs[ci % cityImgs.length];
   const faq = [
     [`Do you offer AC and heating repair in ${c.name}, TN?`, `Yes. We repair, maintain and replace central air conditioners, heat pumps and furnaces for homes throughout ${c.name}, including ${c.areas.slice(0, 3).join(', ')}.`],
     [`How far is NexClima from ${c.name}?`, `${c.drive}. Call ${site.phone} and we’ll give you the earliest time available.`],

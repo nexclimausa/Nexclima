@@ -9,23 +9,31 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(root, 'public/img');
 mkdirSync(outDir, { recursive: true });
 
+// [nombre de salida (descriptivo, ayuda al SEO), archivo original en img-src/, anchos]
 const jobs = [
-  ['hero', [640, 1024, 1376]],
-  ['svc-ac', [480, 800, 1200]],
-  ['svc-heating', [480, 800, 1200]],
-  ['svc-maintenance', [480, 800, 1200]],
-  ['svc-replacement', [480, 800, 1200]],
-  ['about', [640, 1024]],
+  ['hvac-technician-ac-repair-middle-tennessee', 'hvac-technician-ac-repair-middle-tennessee.png', [640, 1024, 1376]],
+  ['nexclima-hvac-technician-la-vergne-tn', 'nexclima-hvac-technician-la-vergne-tn.webp', [640, 1024, 1376]],
+  ['hvac-service-visit-homeowner-tennessee', 'hvac-service-visit-homeowner-tennessee.webp', [640, 1024, 1376]],
+  ['nashville-tn-skyline', 'nashville-tn-skyline.webp', [640, 1024, 1376]],
+  // Servicios: también se usan en tarjetas 4:3, así que llevan recorte propio («card»).
+  ['central-air-conditioning-home-cooling', 'central-air-conditioning-home-cooling.webp', [640, 1024, 1376], 'card'],
+  ['furnace-heating-repair-technician', 'furnace-heating-repair-technician.jpeg', [480, 800, 1200], 'card'],
+  ['hvac-tune-up-air-filter-change', 'hvac-tune-up-air-filter-change.webp', [640, 1024, 1326], 'card'],
+  ['new-heat-pump-installation-home', 'new-heat-pump-installation-home.jpeg', [480, 800, 1200], 'card'],
 ];
-const src = (n) => ['jpeg', 'jpg', 'png'].map((e) => join(root, 'img-src', `${n}.${e}`)).find(existsSync);
 
-for (const [name, widths] of jobs) {
-  const file = src(name === 'hero' ? 'hero-test' : name);
-  if (!file) { console.log(`falta ${name}`); continue; }
+for (const [name, srcFile, widths, card] of jobs) {
+  const file = join(root, 'img-src', srcFile);
+  if (!existsSync(file)) { console.log(`falta ${srcFile}`); continue; }
   for (const w of widths) {
     const out = join(outDir, `${name}-${w}.webp`);
     const info = await sharp(file).resize({ width: w, withoutEnlargement: true }).webp({ quality: w > 1200 ? 62 : 68, effort: 6 }).toFile(out);
     console.log(`${name}-${w}.webp ${info.width}x${info.height} ${Math.round(info.size / 1024)} KB`);
+  }
+  if (card) for (const w of [480, 800]) {
+    const out = join(outDir, `${name}-card-${w}.webp`);
+    const info = await sharp(file).resize({ width: w, height: w * 3 / 4, fit: 'cover', position: sharp.strategy.attention }).webp({ quality: 68, effort: 6 }).toFile(out);
+    console.log(`${name}-card-${w}.webp ${info.width}x${info.height} ${Math.round(info.size / 1024)} KB`);
   }
 }
 
