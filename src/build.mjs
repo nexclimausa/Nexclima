@@ -442,7 +442,7 @@ writeFileSync(join(out, '404.html'), layout({ slug: '404', title: 'Page not foun
 mkdirSync(join(out, 'forms'), { recursive: true });
 writeFileSync(join(out, 'forms/lead-verified.html'), `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Form</title></head><body>
 <form name="lead-verified" method="POST" data-netlify="true" hidden>
-${['issue', 'name', 'phone', 'city', 'page', 'utm_source', 'utm_medium', 'utm_campaign', 'gclid'].map((n) => `<input name="${n}">`).join('')}
+${['subject', 'issue', 'name', 'phone', 'city', 'page', 'utm_source', 'utm_medium', 'utm_campaign', 'gclid'].map((n) => `<input name="${n}">`).join('')}
 </form></body></html>`);
 
 const today = new Date().toISOString().slice(0, 10);

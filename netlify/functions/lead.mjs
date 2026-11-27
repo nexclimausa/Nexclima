@@ -45,7 +45,12 @@ export default async (req) => {
     fetch(site + '/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ 'form-name': 'lead-verified', ...lead }).toString(),
+      // «subject» es el asunto del correo de aviso de Netlify: corto, para leerlo de un vistazo en el móvil.
+      body: new URLSearchParams({
+        'form-name': 'lead-verified',
+        subject: `New lead: ${lead.issue}${lead.city ? ` · ${lead.city}` : ''}`,
+        ...lead,
+      }).toString(),
     }),
   ];
   if (process.env.LEAD_WEBHOOK_URL) {
