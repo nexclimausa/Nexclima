@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, cpSync } fr
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import * as esbuild from 'esbuild';
 import { site, reviews, issues, services, cities, homeFaq, specials, specialsConfirmed } from './data.mjs';
 
@@ -20,6 +21,8 @@ const css = readFileSync(join(root, '.tmp/site.css'), 'utf8').replace(/\/\*![\s\
 
 // JS con Motion, empaquetado y minificado
 await esbuild.build({ entryPoints: [join(root, 'src/app.js')], bundle: true, minify: true, format: 'iife', target: 'es2019', outfile: join(out, 'app.js'), legalComments: 'none' });
+// Versión del JS en la URL (/app.js?v=…): cada cambio obliga al navegador a descargar el nuevo, sin esperar a que caduque la caché.
+const jsVer = createHash('sha1').update(readFileSync(join(out, 'app.js'))).digest('hex').slice(0, 10);
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const url = (slug) => (slug ? `/${slug}/` : '/');
@@ -196,7 +199,7 @@ ${animBoot}
 <script type="application/ld+json">${JSON.stringify(graph)}</script>
 ${ga}
 <script>window.HCP_SRC=${JSON.stringify(`https://online-booking.housecallpro.com/script.js?token=${site.hcp.token}&orgName=${site.hcp.org}`)}</script>
-<script src="/app.js" defer></script>
+<script src="/app.js?v=${jsVer}" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
