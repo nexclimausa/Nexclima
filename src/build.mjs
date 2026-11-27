@@ -201,7 +201,7 @@ ${body}
     <div><h3>Service areas</h3><ul>${cities.map((c) => `<li><a href="${url(c.slug)}">HVAC in ${c.name}</a></li>`).join('')}</ul></div>
     <div><h3>Company</h3><ul><li><a href="/about-us/">About us</a></li><li><a href="/contact-us/">Contact</a></li>${specialsConfirmed ? '<li><a href="/specials/">Specials</a></li>' : ''}<li><a href="${site.reviewsUrl}" rel="noopener" target="_blank">Google reviews</a></li><li><a href="${site.social.facebook}" rel="noopener">Facebook</a></li><li><a href="${site.social.instagram}" rel="noopener">Instagram</a></li><li><a href="/privacy-policy/">Privacy policy</a></li></ul></div>
   </div>
-  <div class="legal"><span>© ${new Date().getFullYear()} ${esc(site.legalName)}. All rights reserved.</span><span>Residential HVAC only · ${esc(site.city)}, Tennessee</span></div>
+  <div class="legal"><span>© ${new Date().getFullYear()} ${esc(site.legalName)}. All rights reserved.</span><span>Residential HVAC only · Based in ${esc(site.city)}, Tennessee · Serving 8 Middle Tennessee cities</span></div>
 </div></footer>
 ${mbar ? `<div class="mbar motion-safe:animate-slide-up"><a class="btn btn-ghost ring-icon" href="${site.phoneHref}" data-loc="mobilebar">${icon('phone')} Call now</a>${book('Book service', 'btn btn-sun', 'mobilebar')}</a></div>` : ''}
 </body>
