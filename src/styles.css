@@ -100,6 +100,8 @@
   .hero-in { padding-top: 48px; padding-bottom: 116px; max-width: var(--wrap) }
   .hero-copy { max-width: 690px }
   .hero h1 { color: #fff; text-wrap: balance }
+  .hero h1 .hl { color: var(--sun) }
+  .hero .lead strong { color: #fff; font-weight: 700 }
   .hero .lead { font-size: 1.13rem; color: #c9d8e6; max-width: 34em }
   .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: .82rem; letter-spacing: .06em; text-transform: uppercase; color: var(--sun); margin-bottom: 14px }
   .eyebrow svg { width: 16px; height: 16px }
@@ -164,6 +166,14 @@
   .dark .sec-head p { color: #b6c7d8 }
   @media (max-width: 700px) { .sec { padding: 60px 0 } .sec.first { padding-top: 52px } }
 
+  .city-pick .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; padding-top: 34px }
+  .city-pick p { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--navy) }
+  .city-pick p svg { width: 24px; height: 24px; color: var(--ice); flex: none }
+  .city-pick p span { font-size: .95rem; color: var(--muted) }
+  .city-pick p b { display: block; font-size: 1.1rem; color: var(--navy) }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px }
+  .chips a { padding: 8px 15px; border: 1.5px solid #d3dee8; border-radius: 999px; font-weight: 600; font-size: .93rem; color: var(--navy); text-decoration: none; background: #fff; transition: border-color .2s, background .2s, color .2s }
+  .chips a:hover, .chips a:focus-visible { border-color: var(--ice); background: var(--ice); color: #fff }
   .proof .wrap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding-top: 34px; padding-bottom: 6px }
   .proof .item { display: flex; align-items: center; gap: 12px; font-weight: 600; color: var(--navy) }
   .proof svg { width: 26px; height: 26px; color: var(--ice); flex: none }

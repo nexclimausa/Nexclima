@@ -228,7 +228,13 @@ const proofStrip = () => `<section class="proof" aria-label="Why homeowners choo
   <div class="item">${icon('users')}<span><b>${site.homeownersServed} homeowners</b><span>served in Middle Tennessee</span></span></div>
   <div class="item">${icon('house')}<span><b>100% residential</b><span>homes only, no commercial jobs</span></span></div>
   <div class="item">${icon('pin')}<span><b>Local to La Vergne</b><span>8 cities, one local team</span></span></div>
-  <div class="item">${icon('star')}<span><b>5-star reviews</b><span><a href="${site.reviewsUrl}" rel="noopener" target="_blank">Read them on Google</a></span></span></div>
+  <div class="item">${icon('star')}<span><b>${site.googleRating && site.googleReviewCount ? `${site.googleRating} on Google (${site.googleReviewCount} reviews)` : '5-star reviews'}</b><span><a href="${site.reviewsUrl}" rel="noopener" target="_blank">Read them on Google</a></span></span></div>
+</div></section>`;
+
+// Selector de ciudad en la portada: enlaces a las páginas locales (cercanía para el cliente y enlazado interno para el SEO).
+const cityPicker = () => `<section class="city-pick" aria-label="Choose your city"><div class="wrap" data-reveal>
+  <p>${icon('pin')}<span><b>Where is your home?</b> Pick your city for local service details.</span></p>
+  <nav class="chips">${cities.map((c) => `<a href="${url(c.slug)}">${esc(c.name)}</a>`).join('')}</nav>
 </div></section>`;
 
 const head = (h2, p = '', extra = '') => `<div class="sec-head" data-reveal><h2>${h2}</h2>${p ? `<p>${p}</p>` : ''}${extra}</div>`;
@@ -264,8 +270,9 @@ const add = (slug, html, { sitemap = true, priority = '0.7' } = {}) => pages.pus
 // ---------- Inicio ----------
 {
   const body = `
-${hero({ eyebrow: 'Based in La Vergne, TN', h1: 'Heating &amp; AC repair for Middle Tennessee homes', lead: 'Local, residential-only HVAC technicians. We find the real cause, explain your options in plain words and get your home comfortable again.', ticks: ['Repair, tune-ups and new systems for homes only', `${site.homeownersServed} Middle Tennessee homeowners served`, 'The price explained before any work starts'] })}
+${hero({ eyebrow: 'Based in La Vergne, TN', h1: '<span class="hl">Heating &amp; AC repair</span> for Middle Tennessee homes', lead: `Local, <strong>residential-only HVAC technicians</strong>${site.responseTime ? ' with <strong>same-day service</strong>' : ''}. We find the real cause, explain your options in plain words and get your home comfortable again.`, ticks: ['Repair, tune-ups and new systems for homes only', `${site.homeownersServed} Middle Tennessee homeowners served`, 'The price explained before any work starts'] })}
 ${quoteBar({ title: 'Get your AC or heat fixed' })}
+${cityPicker()}
 ${proofStrip()}
 <section class="sec first" id="services"><div class="wrap">
   ${head('Residential HVAC services', 'One local team for everything your heating and cooling system needs, from a noisy blower to a full replacement.')}
@@ -363,7 +370,7 @@ cities.forEach((c, ci) => {
     ['Do you work on commercial buildings?', 'No. We focus on homes only: houses, townhomes and condos.'],
   ];
   const body = `
-${hero({ img, crumbs: `<a href="/">Home</a> / <a href="/service-areas/">Service areas</a> / ${c.name}`, eyebrow: `${c.name}, ${c.county}`, h1: `HVAC repair &amp; AC service in ${c.name}, TN`, lead: esc(c.intro), ticks: [esc(c.drive), 'Residential AC, heat pump and furnace service', 'The price explained before work starts'] })}
+${hero({ img, crumbs: `<a href="/">Home</a> / <a href="/service-areas/">Service areas</a> / ${c.name}`, eyebrow: `${c.name}, ${c.county}`, h1: `HVAC repair &amp; AC service in <span class="hl">${c.name}, TN</span>`, lead: esc(c.intro), ticks: [esc(c.drive), 'Residential AC, heat pump and furnace service', 'The price explained before work starts'] })}
 ${quoteBar({ title: `Request service in ${c.name}`, city: c.name })}
 <section class="sec first"><div class="wrap split top">
   <div class="prose" data-reveal><h2>Heating and cooling for ${c.name} homes</h2>
