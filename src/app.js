@@ -91,6 +91,34 @@ d.querySelectorAll('.quote').forEach((box) => {
   let started = false;
   form.addEventListener('focusin', () => { if (!started) { started = true; track('lead_form_start', {}); } });
 
+  // Paso 1 (portada): elegir la ciudad; después aparece el resto del formulario.
+  const step1 = box.querySelector('.q-step1');
+  if (step1) {
+    const local = box.querySelector('.q-local');
+    step1.hidden = false;
+    box.classList.add('stepped');
+    step1.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-city]');
+      if (!b) return;
+      const city = b.dataset.city;
+      form.elements.city.value = city;
+      local.querySelector('span').textContent = city === 'Other'
+        ? 'Tell us what’s going on and we’ll confirm your area.'
+        : `We serve ${city}. ${b.dataset.drive}.`;
+      local.hidden = false;
+      box.classList.add('picked');
+      if (!started) { started = true; track('lead_form_start', { city }); }
+      const grid = box.querySelector('.qgrid');
+      if (!reduce) animate(grid, { opacity: [0, 1], transform: ['translateY(8px)', 'translateY(0)'] }, { duration: 0.45, ease: EASE });
+      form.elements.issue.focus({ preventScroll: true });
+    });
+    local.querySelector('.q-change').addEventListener('click', () => {
+      box.classList.remove('picked');
+      local.hidden = true;
+      step1.querySelector('button').focus();
+    });
+  }
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const issue = form.elements.issue.value;

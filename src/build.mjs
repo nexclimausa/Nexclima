@@ -120,6 +120,11 @@ function quoteBar({ title = 'Request service', city = '' } = {}) {
   const issueOpts = ['', ...issues].map((x) => `<option value="${esc(x)}">${x ? esc(x) : 'Choose one'}</option>`).join('');
   return `<div class="quote-wrap wrap motion-safe:animate-rise [animation-delay:380ms]" id="book"><div class="quote">
   <div class="quote-head"><h2>${esc(title)}</h2><p>${esc(afterSend)} No obligation.</p></div>
+  ${city ? '' : `<div class="q-step1" hidden>
+    <p class="q-ask">${icon('pin')}<span><b>Where is your home?</b> Pick your city to get started.</span></p>
+    <div class="chips">${cities.map((c) => `<button type="button" data-city="${esc(c.name)}" data-drive="${esc(c.drive)}">${esc(c.name)}</button>`).join('')}<button type="button" data-city="Other" data-drive="">Other city</button></div>
+  </div>
+  <p class="q-local" hidden>${icon('check')}<span></span> <button type="button" class="q-change">Change</button></p>`}
   <form name="lead" method="POST" action="${endpoint}" data-endpoint="${endpoint}" data-tel="${site.phoneHref}" data-phone="${site.phone}" novalidate>
     <input type="hidden" name="e" value="">
     <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
@@ -127,7 +132,7 @@ function quoteBar({ title = 'Request service', city = '' } = {}) {
       <div class="field"><label for="q-issue">What’s going on?</label><select id="q-issue" name="issue" required>${issueOpts}</select><span class="err">Choose the closest option.</span></div>
       <div class="field"><label for="q-name">Your name</label><input id="q-name" name="name" autocomplete="name" required><span class="err">Enter your name.</span></div>
       <div class="field"><label for="q-phone">Mobile phone</label><input id="q-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="(615) 555-0123"><span class="err">Enter a valid US mobile number.</span></div>
-      <div class="field"><label for="q-city">City</label><select id="q-city" name="city" autocomplete="address-level2">${cityOpts}</select></div>
+      <div class="field field-city"><label for="q-city">City</label><select id="q-city" name="city" autocomplete="address-level2">${cityOpts}</select></div>
       <button type="submit" class="btn btn-sun">Request service</button>
     </div>
     <div class="form-msg" role="alert"></div>
@@ -231,12 +236,6 @@ const proofStrip = () => `<section class="proof" aria-label="Why homeowners choo
   <div class="item">${icon('star')}<span><b>${site.googleRating && site.googleReviewCount ? `${site.googleRating} on Google (${site.googleReviewCount} reviews)` : '5-star reviews'}</b><span><a href="${site.reviewsUrl}" rel="noopener" target="_blank">Read them on Google</a></span></span></div>
 </div></section>`;
 
-// Selector de ciudad en la portada: enlaces a las páginas locales (cercanía para el cliente y enlazado interno para el SEO).
-const cityPicker = () => `<section class="city-pick" aria-label="Choose your city"><div class="wrap" data-reveal>
-  <p>${icon('pin')}<span><b>Where is your home?</b> Pick your city for local service details.</span></p>
-  <nav class="chips">${cities.map((c) => `<a href="${url(c.slug)}">${esc(c.name)}</a>`).join('')}</nav>
-</div></section>`;
-
 const head = (h2, p = '', extra = '') => `<div class="sec-head" data-reveal><h2>${h2}</h2>${p ? `<p>${p}</p>` : ''}${extra}</div>`;
 
 const serviceCards = (list = services, h = 'h3') => `<div class="grid ${list.length === 4 ? 'g4' : 'g3'}" data-stagger>${list.map((s) => `<a class="card pic" href="${url(s.slug)}"><span class="ph">${cardPic(svcImg[s.slug], '(max-width: 620px) 92vw, (max-width: 1000px) 46vw, 280px')}</span><span class="cb"><${h}>${s.short}</${h}><p>${esc(s.card)}</p><span class="more">${s.short} details <i>→</i></span></span></a>`).join('')}</div>`;
@@ -272,7 +271,6 @@ const add = (slug, html, { sitemap = true, priority = '0.7' } = {}) => pages.pus
   const body = `
 ${hero({ eyebrow: 'Based in La Vergne, TN', h1: '<span class="hl">Heating &amp; AC repair</span> for Middle Tennessee homes', lead: `Local, <strong>residential-only HVAC technicians</strong>${site.responseTime ? ' with <strong>same-day service</strong>' : ''}. We find the real cause, explain your options in plain words and get your home comfortable again.`, ticks: ['Repair, tune-ups and new systems for homes only', `${site.homeownersServed} Middle Tennessee homeowners served`, 'The price explained before any work starts'] })}
 ${quoteBar({ title: 'Get your AC or heat fixed' })}
-${cityPicker()}
 ${proofStrip()}
 <section class="sec first" id="services"><div class="wrap">
   ${head('Residential HVAC services', 'One local team for everything your heating and cooling system needs, from a noisy blower to a full replacement.')}
