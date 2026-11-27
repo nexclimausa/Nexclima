@@ -36,11 +36,11 @@ export const site = {
   // --- Pruebas de confianza: solo se muestran si tienen valor (nunca inventar) ---
   googleRating: '5.0',      // Perfil de Empresa de Google, comprobado el 27-11-2026 (actualízalo de vez en cuando)
   googleReviewCount: 14,    // idem
-  diagnosticPrice: null,    // CONFIRMAR, p. ej. '$79' (decisión comercial)
-  diagnosticWaived: false,  // true si el diagnóstico se descuenta al reparar
+  diagnosticPrice: '$99',   // confirmado por NexClima (27-11-2026): cualquier visita de diagnóstico
+  diagnosticWaived: true,   // si contratan la reparación, solo pagan la reparación
   license: null,            // CONFIRMAR, p. ej. 'TN License #12345'
-  warranty: null,           // CONFIRMAR, p. ej. '1-year labor warranty'
-  responseTime: null,       // CONFIRMAR, p. ej. 'within 30 minutes during business hours'
+  warranty: '1-year warranty on new installations, plus the manufacturer’s 5–10 year parts warranty', // confirmado 27-11-2026
+  responseTime: 'the same day', // confirmado 27-11-2026: servicio el mismo día
   // Auditoría H-08: crear service@nexclima.us y ponerlo aquí en lugar del Gmail.
 };
 
@@ -198,6 +198,7 @@ export const services = [
     ],
     faq: [
       ['How do I know if it is time to replace my HVAC system?', 'Age (12–15+ years), frequent repairs, R-22 refrigerant, rising bills and rooms that never get comfortable are the usual signs. If the repair cost is approaching half the price of a new system, replacement is usually the better investment.'],
+      ['What warranty comes with a new system?', 'Our installation work has a 1-year warranty, and the equipment carries the manufacturer’s parts warranty, usually 5 to 10 years depending on the brand and registration.'],
       ['Do I need repair or full system replacement?', 'It depends on the age of the equipment, the part that failed and what you plan for the home. We give you both prices so you can decide, with no pressure.'],
       ['Can a smart thermostat help lower energy bills?', 'Yes, when it is set up correctly. Schedules and setbacks cut run time, and on a heat pump the thermostat must be configured so it doesn’t lean on costly auxiliary heat.'],
     ],
@@ -297,7 +298,8 @@ export const cities = [
 ];
 
 export const homeFaq = [
-  ['How fast can you come out?', 'Call us and we’ll give you the earliest time we have. Homes close to our La Vergne shop, in La Vergne, Smyrna and southeast Nashville, are usually the quickest to reach.'],
+  ['How fast can you come out?', 'We offer same-day service. Call us and we’ll give you the earliest time we have; homes close to our La Vergne shop, in La Vergne, Smyrna and southeast Nashville, are usually the quickest to reach.'],
+  ['How much does a diagnostic visit cost?', 'The diagnostic visit is $99. If you go ahead with the repair, you only pay for the repair: the $99 is waived.'],
   ['What are the signs my AC system needs repair?', 'Warm air from the vents, ice on the lines, water around the indoor unit, new noises, a breaker that trips, or a power bill that jumps without a reason.'],
   ['Why is airflow weak in some rooms?', 'Usually a dirty filter or coil, a blower problem, closed or blocked vents, or leaky or undersized ductwork. We measure airflow to find which one it is.'],
   ['How often should I service my HVAC system?', 'Twice a year: cooling in spring, heating in fall. Heat pumps work all year, so both visits matter.'],

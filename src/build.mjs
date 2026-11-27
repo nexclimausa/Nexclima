@@ -36,10 +36,16 @@ const IMG = {
   about: { file: 'nexclima-hvac-technician-la-vergne-tn', w: [640, 1024, 1376], ratio: [1376, 917], alt: 'NexClima HVAC technician next to the outdoor AC unit of a Middle Tennessee home', pos: '72% 35%' },
   visit: { file: 'hvac-service-visit-homeowner-tennessee', w: [640, 1024, 1376], ratio: [1376, 917], alt: 'HVAC technician greeting a homeowner at her front porch, with a NexClima van parked outside', pos: '62% 50%' },
   nashville: { file: 'nashville-tn-skyline', w: [640, 1024, 1376], ratio: [1376, 771], alt: 'Nashville, Tennessee skyline at dusk', pos: '60% 50%' },
-  'svc-ac': { file: 'central-air-conditioning-home-cooling', w: [640, 1024, 1376], ratio: [1376, 562], card: true, alt: 'Family relaxing in a cool, bright living room while the central air conditioning runs', pos: '55% 50%' },
-  'svc-heating': { file: 'furnace-heating-repair-technician', w: [480, 800, 1200], ratio: [1200, 896], card: true, alt: 'Technician inspecting a gas furnace in a home utility closet', pos: '72% 45%' },
+  coolhome: { file: 'central-air-conditioning-home-cooling', w: [640, 1024, 1376], ratio: [1376, 562], alt: 'Family relaxing in a cool, bright living room while the central air conditioning runs', pos: '60% 50%' },
+  yearround: { file: 'year-round-hvac-service-middle-tennessee', w: [640, 1024, 1376], ratio: [1376, 519], alt: 'HVAC technician in front of a Middle Tennessee home shown in winter snow and summer sun', pos: '50% 50%' },
+  familyroom: { file: 'family-living-room-comfort', w: [640, 1024, 1376], ratio: [1376, 615], alt: 'Family watching TV in a comfortable living room with cool air from the vent', pos: '60% 50%' },
+  thermostat: { file: 'homeowner-adjusting-thermostat', w: [640, 1024, 1376], ratio: [1376, 668], alt: 'Homeowner adjusting a smart thermostat in her living room', pos: '35% 40%' },
+  winterhome: { file: 'tennessee-home-winter-heating', w: [640, 1024, 1376], ratio: [1376, 684], alt: 'Brick home with warm lights on during a snowy Tennessee winter evening', pos: '50% 50%' },
+  bedroom: { file: 'warm-bedroom-winter-heating', w: [640, 1024, 1376], ratio: [1376, 668], alt: 'Parent tucking a child into bed in a warm room while snow falls outside', pos: '60% 50%' },
+  'svc-ac': { file: 'ac-repair-technician-outdoor-unit', w: [640, 1024, 1376], ratio: [1376, 668], card: true, alt: 'HVAC technician checking refrigerant pressure on an outdoor AC unit with gauges', pos: '55% 50%' },
+  'svc-heating': { file: 'home-heating-family-winter-tennessee', w: [640, 1024, 1376], ratio: [1376, 668], card: true, alt: 'Family staying warm in their living room while snow falls outside', pos: '55% 50%' },
   'svc-maintenance': { file: 'hvac-tune-up-air-filter-change', w: [640, 1024, 1326], ratio: [1326, 768], card: true, alt: 'HVAC technician replacing a return air filter during a home tune-up', pos: '45% 40%' },
-  'svc-replacement': { file: 'new-heat-pump-installation-home', w: [480, 800, 1200], ratio: [1200, 896], card: true, alt: 'New heat pump installed on a clean pad beside a white home', pos: '45% 60%' },
+  'svc-replacement': { file: 'new-heat-pump-system-replacement', w: [640, 1024, 1376], ratio: [1376, 668], card: true, alt: 'New heat pump installed beside a home after a winter snowfall', pos: '50% 60%' },
 };
 const srcset = (n) => IMG[n].w.map((w) => `/img/${IMG[n].file}-${w}.webp ${w}w`).join(', ');
 const largest = (n) => `/img/${IMG[n].file}-${IMG[n].w.at(-1)}.webp`;
@@ -73,12 +79,14 @@ const book = (label, cls = 'btn btn-sun', loc = 'header') => `<a class="${cls}" 
 const logoImg = (h = 46, lazy = false) => `<img src="/img/logo-48.webp" srcset="/img/logo-48.webp 1x, /img/logo-96.webp 2x" width="${Math.round(h * 386 / 96)}" height="${h}" alt="NexClima Inc"${lazy ? ' loading="lazy"' : ''}>`;
 
 // ---------- Pruebas de confianza (solo datos confirmados) ----------
-function trustBits() {
-  const b = [];
-  if (site.diagnosticPrice) b.push(`${site.diagnosticPrice} diagnostic${site.diagnosticWaived ? ', waived when we do the repair' : ''}`);
-  if (site.license) b.push(site.license);
-  if (site.warranty) b.push(site.warranty);
-  return b;
+const diagText = site.diagnosticPrice ? `${site.diagnosticPrice} diagnostic${site.diagnosticWaived ? ', waived when we do the repair' : ''}` : '';
+// Puntos del hero: el precio del diagnóstico sustituye a «price explained» y, si cabe, se añade el servicio el mismo día.
+// Máximo 3 para que el formulario siga viéndose en el primer pantallazo en ordenador.
+function heroTicks(ticks) {
+  const t = ticks.map((x) => (diagText && /price explained/i.test(x) ? diagText : x));
+  if (site.license) t.push(site.license);
+  if (site.responseTime && t.length < 3) t.push('Same-day service available');
+  return t.slice(0, 3);
 }
 function ratingLine(cls = '') {
   const inner = site.googleRating && site.googleReviewCount
@@ -91,7 +99,7 @@ const afterSend = site.responseTime ? `We’ll call you back ${site.responseTime
 // ---------- Hero (foto + texto) y barra de formulario ----------
 const rise = (ms) => `motion-safe:animate-rise [animation-delay:${ms}ms]`;
 function hero({ img = 'hero', eyebrow = '', crumbs = '', h1, lead, ticks = [], call = true }) {
-  const t = [...ticks, ...trustBits()];
+  const t = heroTicks(ticks);
   return `<section class="hero on-dark">
   <img class="hero-img motion-safe:animate-settle" src="${largest(img)}" srcset="${srcset(img)}" sizes="100vw" width="${IMG[img].ratio[0]}" height="${IMG[img].ratio[1]}" alt="${esc(IMG[img].alt)}" fetchpriority="high" decoding="async" style="object-position:${IMG[img].pos}">
   <div class="wrap hero-in"><div class="hero-copy">
@@ -308,7 +316,7 @@ add('hvac-services', layout({
 for (const s of services) {
   const others = services.filter((x) => x !== s);
   const body = `
-${hero({ img: svcImg[s.slug], crumbs: `<a href="/">Home</a> / <a href="/hvac-services/">HVAC services</a> / ${s.short}`, h1: esc(s.h1), lead: esc(s.lead), ticks: ['Local technicians based in La Vergne', 'The price explained before work starts'] })}
+${hero({ img: svcImg[s.slug], crumbs: `<a href="/">Home</a> / <a href="/hvac-services/">HVAC services</a> / ${s.short}`, h1: esc(s.h1), lead: esc(s.lead), ticks: ['Local technicians based in La Vergne', s.slug === 'system-replacement' && site.warranty ? '1-year installation warranty + 5–10 year manufacturer parts warranty' : 'The price explained before work starts'] })}
 ${quoteBar({ title: `Book ${s.short.toLowerCase()}` })}
 <section class="sec soft first"><div class="wrap split">
   ${head(`Signs you need ${s.short.toLowerCase()}`, 'If you notice any of these, call before a small problem becomes an expensive one.', book('Book a visit', 'btn btn-sun', 'signs'))}
@@ -345,7 +353,7 @@ add('service-areas', layout({
 // ---------- Páginas de ciudad ----------
 // Foto de cada ciudad: Nashville tiene la suya; el resto rota para que no se repita la misma.
 const cityImgs = ['visit', 'hero', 'about', 'svc-maintenance'];
-const cityImgFor = { Nashville: 'nashville' };
+const cityImgFor = { 'La Vergne': 'visit', Smyrna: 'yearround', Murfreesboro: 'winterhome', Nashville: 'nashville', Brentwood: 'coolhome', Franklin: 'familyroom', 'Mt. Juliet': 'thermostat', Lebanon: 'bedroom' };
 cities.forEach((c, ci) => {
   const img = cityImgFor[c.name] || cityImgs[ci % cityImgs.length];
   const faq = [

@@ -9,30 +9,40 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(root, 'public/img');
 mkdirSync(outDir, { recursive: true });
 
-// [nombre de salida (descriptivo, ayuda al SEO), archivo original en img-src/, anchos]
+// [nombre de salida (descriptivo, ayuda al SEO), archivo original en img-src/, anchos, recorte 4:3 para tarjetas, recorte inferior]
+// «recorte inferior» (0.11 = 11 %) quita la marca de agua de Gemini de las imágenes hechas con IA.
+const WM = 0.11;
 const jobs = [
   ['hvac-technician-ac-repair-middle-tennessee', 'hvac-technician-ac-repair-middle-tennessee.png', [640, 1024, 1376]],
   ['nexclima-hvac-technician-la-vergne-tn', 'nexclima-hvac-technician-la-vergne-tn.webp', [640, 1024, 1376]],
   ['hvac-service-visit-homeowner-tennessee', 'hvac-service-visit-homeowner-tennessee.webp', [640, 1024, 1376]],
   ['nashville-tn-skyline', 'nashville-tn-skyline.webp', [640, 1024, 1376]],
+  ['central-air-conditioning-home-cooling', 'central-air-conditioning-home-cooling.webp', [640, 1024, 1376]],
+  ['year-round-hvac-service-middle-tennessee', 'year-round-hvac-service-middle-tennessee.png', [640, 1024, 1376], false, WM],
+  ['family-living-room-comfort', 'family-living-room-comfort.webp', [640, 1024, 1376]],
+  ['homeowner-adjusting-thermostat', 'homeowner-adjusting-thermostat.webp', [640, 1024, 1376], false, WM],
+  ['tennessee-home-winter-heating', 'tennessee-home-winter-heating.png', [640, 1024, 1376], false, WM],
+  ['warm-bedroom-winter-heating', 'warm-bedroom-winter-heating.png', [640, 1024, 1376], false, WM],
   // Servicios: también se usan en tarjetas 4:3, así que llevan recorte propio («card»).
-  ['central-air-conditioning-home-cooling', 'central-air-conditioning-home-cooling.webp', [640, 1024, 1376], 'card'],
-  ['furnace-heating-repair-technician', 'furnace-heating-repair-technician.jpeg', [480, 800, 1200], 'card'],
-  ['hvac-tune-up-air-filter-change', 'hvac-tune-up-air-filter-change.webp', [640, 1024, 1326], 'card'],
-  ['new-heat-pump-installation-home', 'new-heat-pump-installation-home.jpeg', [480, 800, 1200], 'card'],
+  ['ac-repair-technician-outdoor-unit', 'ac-repair-technician-outdoor-unit.webp', [640, 1024, 1376], true, WM],
+  ['home-heating-family-winter-tennessee', 'home-heating-family-winter-tennessee.png', [640, 1024, 1376], true, WM],
+  ['hvac-tune-up-air-filter-change', 'hvac-tune-up-air-filter-change.webp', [640, 1024, 1326], true],
+  ['new-heat-pump-system-replacement', 'new-heat-pump-system-replacement.png', [640, 1024, 1376], true, WM],
 ];
 
-for (const [name, srcFile, widths, card] of jobs) {
+for (const [name, srcFile, widths, card, cropBottom = 0] of jobs) {
   const file = join(root, 'img-src', srcFile);
   if (!existsSync(file)) { console.log(`falta ${srcFile}`); continue; }
+  const m = await sharp(file).metadata();
+  const base = await sharp(file).extract({ left: 0, top: 0, width: m.width, height: Math.round(m.height * (1 - cropBottom)) }).toBuffer();
   for (const w of widths) {
     const out = join(outDir, `${name}-${w}.webp`);
-    const info = await sharp(file).resize({ width: w, withoutEnlargement: true }).webp({ quality: w > 1200 ? 62 : 68, effort: 6 }).toFile(out);
+    const info = await sharp(base).resize({ width: w, withoutEnlargement: true }).webp({ quality: w > 1200 ? 62 : 68, effort: 6 }).toFile(out);
     console.log(`${name}-${w}.webp ${info.width}x${info.height} ${Math.round(info.size / 1024)} KB`);
   }
   if (card) for (const w of [480, 800]) {
     const out = join(outDir, `${name}-card-${w}.webp`);
-    const info = await sharp(file).resize({ width: w, height: w * 3 / 4, fit: 'cover', position: sharp.strategy.attention }).webp({ quality: 68, effort: 6 }).toFile(out);
+    const info = await sharp(base).resize({ width: w, height: w * 3 / 4, fit: 'cover', position: sharp.strategy.attention }).webp({ quality: 68, effort: 6 }).toFile(out);
     console.log(`${name}-card-${w}.webp ${info.width}x${info.height} ${Math.round(info.size / 1024)} KB`);
   }
 }
