@@ -62,8 +62,10 @@
   .topbar { background: #081522; color: #b9cadb; font-size: .85rem }
   .topbar .wrap { display: flex; justify-content: space-between; gap: 12px; min-height: 36px; align-items: center }
   .topbar a { color: #fff; text-decoration: none; font-weight: 600 }
-  .site-head { position: sticky; top: 0; z-index: 50; background: rgba(13,34,56,.97); backdrop-filter: saturate(1.4) blur(10px); -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  /* El fondo con desenfoque va en ::before: si estuviera en la cabecera, el menú móvil (position: fixed) quedaría encerrado dentro de ella. */
+  .site-head { position: sticky; top: 0; z-index: 50; background: transparent;
     transition: box-shadow .3s var(--ease); border-bottom: 1px solid rgba(255,255,255,.06) }
+  .site-head::before { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(13,34,56,.97); backdrop-filter: saturate(1.4) blur(10px); -webkit-backdrop-filter: saturate(1.4) blur(10px) }
   .site-head .wrap { display: flex; align-items: center; gap: 16px; min-height: 76px; transition: min-height .35s var(--ease) }
   .site-head.scrolled { box-shadow: 0 10px 30px -12px rgba(0,0,0,.5) }
   .site-head.scrolled .wrap { min-height: 64px }
@@ -85,7 +87,7 @@
     .nav, .head-cta .btn { display: none }
     .menu-btn { display: block }
     .head-cta { margin-left: auto }
-    .nav.open { display: flex; flex-direction: column; align-items: stretch; position: fixed; inset: 112px 0 0; background: var(--navy); padding: 12px var(--pad) 120px; overflow: auto; gap: 0; animation: rise .45s var(--ease) both }
+    .nav.open { display: flex; flex-direction: column; align-items: stretch; position: fixed; top: 112px; left: 0; right: 0; bottom: 0; background: var(--navy); padding: 12px var(--pad) 120px; overflow: auto; gap: 0; animation: rise .45s var(--ease) both }
     .nav.open a { font-size: 1.15rem; padding: 16px 6px; border-bottom: 1px solid rgba(255,255,255,.1); border-radius: 0 }
     .nav.open a::after { display: none }
   }
@@ -167,22 +169,21 @@
   @media (max-width: 700px) { .sec { padding: 60px 0 } .sec.first { padding-top: 52px } }
 
   /* Formulario en 2 pasos (portada): 1) ciudad, 2) el resto. Sin JavaScript se ve el formulario completo. */
-  .q-step1 { margin-bottom: 4px }
-  .q-ask, .q-local { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; color: var(--navy) }
-  .q-ask svg, .q-local svg { width: 22px; height: 22px; color: var(--ice); flex: none }
-  .q-ask span { color: var(--muted) }
-  .q-ask b { color: var(--navy); margin-right: 4px }
-  .q-local svg { color: var(--ok) }
+  .q-step1:not([hidden]) { display: grid; grid-template-columns: minmax(0, 420px) auto; justify-content: start; gap: 12px; align-items: end }
+  .q-step1 label { display: flex; align-items: center; gap: 6px }
+  .q-step1 label svg { width: 18px; height: 18px; color: var(--ice) }
+  .q-step1 .btn { min-height: 52px; padding-inline: 28px }
+  .q-local { display: grid; grid-template-columns: auto minmax(0, max-content) auto; justify-content: start; align-items: center; gap: 10px; margin: 0 0 12px; color: var(--navy); line-height: 1.35 }
+  .q-local[hidden] { display: none }
+  .q-local svg { width: 22px; height: 22px; color: var(--ok); flex: none }
   .q-local span { font-weight: 600 }
-  .q-change { background: none; border: 0; padding: 0; color: var(--ice); font: inherit; font-size: .9rem; text-decoration: underline; cursor: pointer }
+  .q-change { background: none; border: 0; padding: 6px 0; color: var(--ice); font: inherit; font-size: .9rem; text-decoration: underline; cursor: pointer }
+  @media (max-width: 560px) { .q-step1:not([hidden]) { grid-template-columns: 1fr auto } .q-step1 .btn { padding-inline: 20px } }
   .quote.stepped:not(.picked) .qgrid { display: none }
-  .quote.picked .q-step1, .quote.picked .field-city { display: none }
+  .quote.picked .q-step1, .quote.picked .field-city { display: none !important }
   .quote.picked .qgrid { grid-template-columns: 1.25fr 1fr 1fr auto }
   @media (max-width: 1080px) { .quote.picked .qgrid { grid-template-columns: 1fr 1fr } }
   @media (max-width: 560px) { .quote.picked .qgrid { grid-template-columns: 1fr } }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px }
-  .chips a, .chips button { padding: 9px 16px; font-family: inherit; cursor: pointer; border: 1.5px solid #d3dee8; border-radius: 999px; font-weight: 600; font-size: .93rem; color: var(--navy); text-decoration: none; background: #fff; transition: border-color .2s, background .2s, color .2s }
-  .chips a:hover, .chips a:focus-visible, .chips button:hover, .chips button:focus-visible { border-color: var(--ice); background: var(--ice); color: #fff }
   .proof .wrap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding-top: 34px; padding-bottom: 6px }
   .proof .item { display: flex; align-items: center; gap: 12px; font-weight: 600; color: var(--navy) }
   .proof svg { width: 26px; height: 26px; color: var(--ice); flex: none }

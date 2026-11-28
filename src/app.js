@@ -56,6 +56,7 @@ const nav = d.getElementById('nav');
 if (btn && nav) {
   btn.addEventListener('click', () => {
     const open = nav.classList.toggle('open');
+    if (open) nav.style.top = Math.round(btn.closest('header, .site-head').getBoundingClientRect().bottom) + 'px';
     btn.setAttribute('aria-expanded', String(open));
     btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     d.body.style.overflow = open ? 'hidden' : '';
@@ -97,25 +98,29 @@ d.querySelectorAll('.quote').forEach((box) => {
     const local = box.querySelector('.q-local');
     step1.hidden = false;
     box.classList.add('stepped');
-    step1.addEventListener('click', (e) => {
-      const b = e.target.closest('[data-city]');
-      if (!b) return;
-      const city = b.dataset.city;
+    const where = step1.querySelector('select');
+    const go = () => {
+      const city = where.value;
+      if (!city) { where.closest('.field').classList.add('bad'); where.focus(); return; }
+      where.closest('.field').classList.remove('bad');
       form.elements.city.value = city;
+      const drive = where.selectedOptions[0].dataset.drive;
       local.querySelector('span').textContent = city === 'Other'
         ? 'Tell us what’s going on and we’ll confirm your area.'
-        : `We serve ${city}. ${b.dataset.drive}.`;
+        : `We serve ${city}.${drive ? ` ${drive}.` : ''}`;
       local.hidden = false;
       box.classList.add('picked');
       if (!started) { started = true; track('lead_form_start', { city }); }
       const grid = box.querySelector('.qgrid');
       if (!reduce) animate(grid, { opacity: [0, 1], transform: ['translateY(8px)', 'translateY(0)'] }, { duration: 0.45, ease: EASE });
       form.elements.issue.focus({ preventScroll: true });
-    });
+    };
+    where.addEventListener('change', go);
+    step1.querySelector('.q-next').addEventListener('click', go);
     local.querySelector('.q-change').addEventListener('click', () => {
       box.classList.remove('picked');
       local.hidden = true;
-      step1.querySelector('button').focus();
+      where.focus();
     });
   }
 

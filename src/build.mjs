@@ -124,8 +124,8 @@ function quoteBar({ title = 'Request service', city = '' } = {}) {
   return `<div class="quote-wrap wrap motion-safe:animate-rise [animation-delay:380ms]" id="book"><div class="quote">
   <div class="quote-head"><h2>${esc(title)}</h2><p>${esc(afterSend)} No obligation.</p></div>
   ${city ? '' : `<div class="q-step1" hidden>
-    <p class="q-ask">${icon('pin')}<span><b>Where is your home?</b> Pick your city to get started.</span></p>
-    <div class="chips">${cities.map((c) => `<button type="button" data-city="${esc(c.name)}" data-drive="${esc(c.drive)}">${esc(c.name)}</button>`).join('')}<button type="button" data-city="Other" data-drive="">Other city</button></div>
+    <div class="field"><label for="q-where">${icon('pin')} Where is your home?</label><select id="q-where"><option value="">Choose your city</option>${cities.map((c) => `<option value="${esc(c.name)}" data-drive="${esc(c.drive)}">${esc(c.name)}</option>`).join('')}<option value="Other" data-drive="">Other city</option></select><span class="err">Choose your city to continue.</span></div>
+    <button type="button" class="btn btn-sun q-next">Next</button>
   </div>
   <p class="q-local" hidden>${icon('check')}<span></span> <button type="button" class="q-change">Change</button></p>`}
   <form name="lead" method="POST" action="${endpoint}" data-endpoint="${endpoint}" data-tel="${site.phoneHref}" data-phone="${site.phone}" novalidate>
