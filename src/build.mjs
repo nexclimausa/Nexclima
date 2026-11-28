@@ -211,9 +211,9 @@ ${ga}
 <script>window.HCP_SRC=${JSON.stringify(`https://online-booking.housecallpro.com/script.js?token=${site.hcp.token}&orgName=${site.hcp.org}`)}</script>
 <script src="/app.js?v=${jsVer}" defer></script>
 </head>
-<body>
+<body${site.season === 'christmas' ? ' class="xmas"' : ''}>
 <a class="skip" href="#main">Skip to content</a>
-<div class="topbar"><div class="wrap"><span class="hide-s">Residential heating &amp; cooling · ${cityText.replace(' and ', ' &amp; ')}</span><a href="${site.phoneHref}" data-loc="topbar">Call ${site.phone}</a></div></div>
+<div class="topbar"><div class="wrap"><span class="hide-s">Residential heating &amp; cooling · ${cityText.replace(' and ', ' &amp; ')}</span><span class="topbar-r">${site.season === 'christmas' ? '<span class="xmas-hi">Happy holidays</span>' : ''}<a href="${site.phoneHref}" data-loc="topbar">Call ${site.phone}</a></span></div></div>
 <header class="site-head"><div class="wrap">
   <a class="logo" href="/" aria-label="NexClima home">${logoImg()}</a>
   <nav class="nav" id="nav" aria-label="Main">${navItems.map(([n, s]) => `<a href="${url(s)}"${s === slug ? ' aria-current="page"' : ''}>${n}</a>`).join('')}</nav>
@@ -224,6 +224,7 @@ ${ga}
 ${body}
 </main>
 <footer class="site-foot"><div class="wrap">
+  ${site.season === 'christmas' ? '<p class="xmas-foot">Happy holidays from the NexClima team. Stay warm this winter!</p>' : ''}
   <div class="cols">
     <div><a class="logo" href="/" aria-label="NexClima home">${logoImg(44, true)}</a>
       <p style="margin-top:16px">Residential heating and air conditioning repair, maintenance and replacement for homes across Middle Tennessee.</p>

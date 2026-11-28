@@ -28,6 +28,11 @@ despliegue de Netlify (nexclima.netlify.app mientras no tenga el dominio, vistas
 Al conectar nexclima.us en Netlify como dominio principal, **lanza un nuevo despliegue** (Deploys → Trigger deploy):
 así el sitio pasa a indexable y nexclima.netlify.app redirige con 301 a nexclima.us.
 
+## Decoración de temporada
+`season` en `src/data.mjs`: `'christmas'` pone luces bajo el menú, nieve suave en la portada de cada página y en la
+banda de llamada, y «Happy holidays» arriba y en el pie. Todo es CSS (sin imágenes ni JavaScript) y no mueve nada
+de sitio. **En enero, cámbialo a `null`** y vuelve a publicar.
+
 ## Leads, reservas y spam
 - **Reservar online**: todos los botones «Book…» abren el widget de Housecall Pro (se carga después de la página para
   no frenarla). Si no cargara, bajan al formulario.

@@ -33,6 +33,8 @@ export const site = {
   hcp: { token: '24d4fbcb0c6c4212a1c0480e124b8689', org: 'Nexclima-Inc' },
   // ID de Google Analytics 4 (G-XXXX). Vacío = no se carga nada.
   ga4: '',
+  // Decoración de temporada (temporal). 'christmas' = adornos de Navidad; null = web normal. Quítalo en enero.
+  season: 'christmas',
   // --- Pruebas de confianza: solo se muestran si tienen valor (nunca inventar) ---
   googleRating: '5.0',      // Perfil de Empresa de Google, comprobado el 27-11-2026 (actualízalo de vez en cuando)
   googleReviewCount: 14,    // idem
