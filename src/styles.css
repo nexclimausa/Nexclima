@@ -267,6 +267,17 @@
   .facts { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px }
   .facts li { display: flex; gap: 12px }
   .facts svg { width: 22px; height: 22px; color: var(--ice); flex: none; margin-top: 3px }
+  .tel { white-space: nowrap }
+  @media (min-width: 701px) { .city-intro { padding-bottom: 64px } }
+  .assure { padding: 56px 0 }
+  .assure-grid { display: grid; gap: 18px }
+  .assure-grid.two { grid-template-columns: 1fr 1fr }
+  @media (max-width: 800px) { .assure-grid.two { grid-template-columns: 1fr } }
+  .assure-item { display: flex; gap: 18px; align-items: flex-start; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 26px 28px }
+  .assure-item > svg { width: 34px; height: 34px; color: var(--ice); flex: none }
+  .assure-item h2 { font-size: 1.35rem; margin: 0 0 8px }
+  .assure-item ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 28px; font-weight: 600; color: var(--navy) }
+  .assure-item p { margin: 0 0 14px }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 }
   .tags li { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: .92rem }
 

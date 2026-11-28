@@ -21,6 +21,13 @@ unos 310-400 KB en unas 10 peticiones, fotos incluidas (el sitio actual pesa uno
   sitemap.xml, robots.txt, canonical e imagen para compartir de 1200×630.
 - **URLs del sitio actual conservadas** (servicios y La Vergne), así no se pierde posicionamiento.
 
+## Pruebas sin indexar
+Solo es producción el despliegue de `main` en el dominio real (`site.url`, https://nexclima.us). Cualquier otro
+despliegue de Netlify (nexclima.netlify.app mientras no tenga el dominio, vistas previas de PR, ramas) sale con
+`robots.txt` «Disallow: /», cabecera `X-Robots-Tag: noindex, nofollow` y `<meta name="robots" content="noindex,nofollow">`.
+Al conectar nexclima.us en Netlify como dominio principal, **lanza un nuevo despliegue** (Deploys → Trigger deploy):
+así el sitio pasa a indexable y nexclima.netlify.app redirige con 301 a nexclima.us.
+
 ## Leads, reservas y spam
 - **Reservar online**: todos los botones «Book…» abren el widget de Housecall Pro (se carga después de la página para
   no frenarla). Si no cargara, bajan al formulario.
@@ -43,6 +50,7 @@ Nada de esto se muestra hasta que tenga un valor real:
 7. ID de GA4 (`ga4`).
 8. Fotos: ya se usan las de NexClima («Imagenes a Usar», con nombres descriptivos en `img-src/`). La del técnico junto al equipo es real; el resto son de ambientación hechas con IA (a las que tenían marca de agua se les recorta abajo en `src/images.mjs`).
 9. Que se explique el precio antes de empezar cualquier trabajo (aparece en los puntos destacados).
+10. Financiación (`financing`): pendiente. Con un texto confirmado aparece en la portada junto a la garantía. Nunca inventar entidad, TAE, cuotas ni plazos.
 
 ## Siguientes fases (según la auditoría)
 - Versión en español de la portada y de 3 servicios.

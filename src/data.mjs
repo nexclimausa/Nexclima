@@ -40,6 +40,9 @@ export const site = {
   diagnosticWaived: true,   // si contratan la reparación, solo pagan la reparación
   license: null,            // CONFIRMAR, p. ej. 'TN License #12345'
   warranty: '1-year warranty on new installations, plus the manufacturer’s 5–10 year parts warranty', // confirmado 27-11-2026
+  // Financiación: null = no se muestra. CONFIRMAR con NexClima (entidad, condiciones) antes de poner un texto,
+  // p. ej. 'Financing options available'. Nunca inventar entidad, TAE, cuotas, plazos ni aprobación.
+  financing: null,
   responseTime: 'the same day', // confirmado 27-11-2026: servicio el mismo día
   // Auditoría H-08: crear service@nexclima.us y ponerlo aquí en lugar del Gmail.
 };
