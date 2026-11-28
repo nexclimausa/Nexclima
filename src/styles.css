@@ -268,6 +268,7 @@
   .facts li { display: flex; gap: 12px }
   .facts svg { width: 22px; height: 22px; color: var(--ice); flex: none; margin-top: 3px }
   .tel { white-space: nowrap }
+  .on-dark .tel { color: #fff; font-weight: 600 }
   @media (min-width: 701px) { .city-intro { padding-bottom: 64px } }
   .assure { padding: 56px 0 }
   .assure-grid { display: grid; gap: 18px }
@@ -278,6 +279,25 @@
   .assure-item h2 { font-size: 1.35rem; margin: 0 0 8px }
   .assure-item ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 28px; font-weight: 600; color: var(--navy) }
   .assure-item p { margin: 0 0 14px }
+  .assure-item > div { min-width: 0 }
+  @media (max-width: 420px) { .assure-item { gap: 12px; padding: 22px 18px } .assure-item > svg { width: 28px; height: 28px } }
+  /* ---------- Navidad (temporal): solo con site.season = 'christmas' (clase .xmas en <body>) ---------- */
+  .topbar-r { display: flex; align-items: center; gap: 10px; white-space: nowrap }
+  .xmas-hi { color: #ffd27a; font-weight: 600 }
+  .xmas-hi::before { content: "\2744\FE0E"; margin-right: 6px; color: #fff }
+  .xmas-hi::after { content: "\00B7"; margin-left: 10px; color: #6f86a0 }
+  .xmas .site-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: -7px; height: 12px; pointer-events: none;
+    background:
+      radial-gradient(circle at 12px 8px, #e5484d 3.5px, transparent 4.5px) 0 0 / 96px 12px repeat-x,
+      radial-gradient(circle at 36px 8px, #f6c445 3.5px, transparent 4.5px) 0 0 / 96px 12px repeat-x,
+      radial-gradient(circle at 60px 8px, #2fb36b 3.5px, transparent 4.5px) 0 0 / 96px 12px repeat-x,
+      radial-gradient(circle at 84px 8px, #5aa9f5 3.5px, transparent 4.5px) 0 0 / 96px 12px repeat-x,
+      linear-gradient(#24384f, #24384f) 0 3px / 100% 1px no-repeat }
+  .xmas .hero::after, .xmas .cta-band::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .22;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' fill='%23fff'%3E%3Ccircle cx='20' cy='30' r='2'/%3E%3Ccircle cx='90' cy='12' r='1.5'/%3E%3Ccircle cx='160' cy='40' r='2.5'/%3E%3Ccircle cx='60' cy='95' r='1.5'/%3E%3Ccircle cx='130' cy='120' r='2'/%3E%3Ccircle cx='200' cy='100' r='1.5'/%3E%3Ccircle cx='30' cy='170' r='2.5'/%3E%3Ccircle cx='105' cy='190' r='1.5'/%3E%3Ccircle cx='180' cy='175' r='2'/%3E%3Cg stroke='%23fff' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M190 8v14M183 11l14 8M183 19l14-8'/%3E%3Cpath d='M48 140v14M41 143l14 8M41 151l14-8'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 220px 220px }
+  .xmas .hero::after { z-index: -1 }
+  .xmas-foot { color: #ffd27a; font-weight: 600; text-align: center; margin: -20px 0 36px; padding-bottom: 22px; border-bottom: 1px solid #1d3149 }
+  .xmas-foot::before { content: "\2744\FE0E  "; color: #fff }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 }
   .tags li { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: .92rem }
 
