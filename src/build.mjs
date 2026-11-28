@@ -24,6 +24,16 @@ await esbuild.build({ entryPoints: [join(root, 'src/app.js')], bundle: true, min
 // Versión del JS en la URL (/app.js?v=…): cada cambio obliga al navegador a descargar el nuevo, sin esperar a que caduque la caché.
 const jsVer = createHash('sha1').update(readFileSync(join(out, 'app.js'))).digest('hex').slice(0, 10);
 
+// ¿Producción o pruebas? En Netlify, URL es el dominio principal del sitio y CONTEXT el tipo de despliegue.
+// Solo es producción el despliegue de «main» servido en el dominio real (site.url). Todo lo demás
+// (nexclima.netlify.app sin dominio propio, vistas previas de PR, ramas) sale con noindex para que Google no lo indexe.
+// Fuera de Netlify (build en local) se genera la versión de producción.
+const onNetlify = process.env.NETLIFY === 'true';
+const isProd = !onNetlify || (process.env.CONTEXT === 'production' && (process.env.URL || '').replace(/\/$/, '') === site.url);
+const staging = !isProd;
+// Con el dominio real activo, el subdominio de Netlify redirige al dominio real (evita contenido duplicado).
+const netlifyHost = process.env.SITE_NAME ? `https://${process.env.SITE_NAME}.netlify.app` : '';
+
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const url = (slug) => (slug ? `/${slug}/` : '/');
 const abs = (slug) => site.url + url(slug);
@@ -184,7 +194,7 @@ function layout({ slug, title, desc, body, ld = [], noindex = false, mbar = true
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${canonical}">
-${noindex ? '<meta name="robots" content="noindex,follow">' : ''}
+${staging ? '<meta name="robots" content="noindex,nofollow">' : noindex ? '<meta name="robots" content="noindex,follow">' : ''}
 ${heroImg ? `<link rel="preload" as="image" type="image/webp" imagesrcset="${srcset(heroImg)}" imagesizes="100vw" fetchpriority="high">` : ''}
 <meta property="og:type" content="website"><meta property="og:site_name" content="NexClima">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
@@ -239,6 +249,10 @@ const proofStrip = () => `<section class="proof" aria-label="Why homeowners choo
   <div class="item">${icon('star')}<span><b>${site.googleRating && site.googleReviewCount ? `${site.googleRating} on Google (${site.googleReviewCount} reviews)` : '5-star reviews'}</b><span><a href="${site.reviewsUrl}" rel="noopener" target="_blank">Read them on Google</a></span></span></div>
 </div></section>`;
 
+// Teléfono que nunca se parte en dos líneas: «(615) 669-» / «9287».
+const tel = (loc = '') => `<a class="tel" href="${site.phoneHref}"${loc ? ` data-loc="${loc}"` : ''}>${site.phone}</a>`;
+const telText = (html, loc) => html.split(esc(site.phone)).join(tel(loc));
+
 const head = (h2, p = '', extra = '') => `<div class="sec-head" data-reveal><h2>${h2}</h2>${p ? `<p>${p}</p>` : ''}${extra}</div>`;
 
 const serviceCards = (list = services, h = 'h3') => `<div class="grid ${list.length === 4 ? 'g4' : 'g3'}" data-stagger>${list.map((s) => `<a class="card pic" href="${url(s.slug)}"><span class="ph">${cardPic(svcImg[s.slug], '(max-width: 620px) 92vw, (max-width: 1000px) 46vw, 280px')}</span><span class="cb"><${h}>${s.short}</${h}><p>${esc(s.card)}</p><span class="more">${s.short} details <i>→</i></span></span></a>`).join('')}</div>`;
@@ -254,15 +268,23 @@ const howItWorks = () => `<section class="sec dark on-dark"><div class="wrap">
   </ol>
 </div></section>`;
 
+// Garantía (confirmada) y financiación (solo si NexClima la confirma en data.mjs: site.financing).
+const assurance = () => {
+  const blocks = [];
+  if (site.warranty) blocks.push(`<div class="assure-item">${icon('shield')}<div><h2>Warranty</h2><ul><li>1-year installation warranty</li><li>5–10 year manufacturer parts warranty</li></ul></div></div>`);
+  if (site.financing) blocks.push(`<div class="assure-item">${icon('check')}<div><h2>Financing</h2><p>${esc(site.financing)}</p><a class="btn btn-ghost" href="${site.phoneHref}" data-loc="financing">${icon('phone')} Call ${site.phone}</a></div></div>`);
+  return blocks.length ? `<section class="sec soft assure" aria-label="Warranty${site.financing ? ' and financing' : ''}"><div class="wrap"><div class="assure-grid${blocks.length > 1 ? ' two' : ''}" data-stagger>${blocks.join('')}</div></div></section>` : '';
+};
+
 const areasGrid = (list = cities) => `<div class="areas" data-stagger>${list.map((c) => `<a href="${url(c.slug)}">${c.name}<span>${c.county.replace(' County', ' Co.')}</span></a>`).join('')}</div>`;
 
 const faqBlock = (faq, title = 'Frequently asked questions') => `<section class="sec"><div class="wrap split top">
-  ${head(title, `Still unsure? Call <a href="${site.phoneHref}" data-loc="faq">${site.phone}</a> and ask a technician.`)}
-  <div class="faq" data-stagger>${faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div>
+  ${head(title, `Still unsure? Call ${tel('faq')} and ask a technician.`)}
+  <div class="faq" data-stagger>${faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}</summary><p>${telText(esc(a), 'faq')}</p></details>`).join('')}</div>
 </div></section>`;
 
 const ctaBand = (h = 'Need heat or AC fixed?', p = `Call ${site.phone} or book online. We serve ${cityText}.`) => `<section class="cta-band on-dark"><div class="wrap" data-reveal>
-  <div><h2>${esc(h)}</h2><p>${esc(p)}</p></div>
+  <div><h2>${esc(h)}</h2><p>${telText(esc(p), 'cta')}</p></div>
   <div class="acts"><a class="btn btn-sun" href="${site.phoneHref}" data-loc="cta">${icon('phone')} Call ${site.phone}</a>${book('Book online', 'btn btn-ghost', 'cta')}</div>
 </div></section>`;
 
@@ -284,6 +306,7 @@ ${proofStrip()}
   <ul class="signs" data-stagger>${['AC running, but blowing warm air', 'Heat pump covered in ice', 'Water leaking under the indoor unit', 'Some rooms always hot or cold', 'Strange noise or smell from the vents', 'Power bill higher than last year'].map((x) => `<li>${x}</li>`).join('')}</ul>
 </div></section>
 ${howItWorks()}
+${assurance()}
 <section class="sec"><div class="wrap">
   ${head('What homeowners say about NexClima', `Real reviews from Google, from homeowners across Middle Tennessee. <a href="${site.reviewsUrl}" rel="noopener" target="_blank">Read all reviews</a>.`)}
   ${reviewGrid()}
@@ -373,7 +396,7 @@ cities.forEach((c, ci) => {
   const body = `
 ${hero({ img, crumbs: `<a href="/">Home</a> / <a href="/service-areas/">Service areas</a> / ${c.name}`, eyebrow: `${c.name}, ${c.county}`, h1: `HVAC repair &amp; AC service in <span class="hl">${c.name}, TN</span>`, lead: esc(c.intro), ticks: [esc(c.drive), 'Residential AC, heat pump and furnace service', 'The price explained before work starts'] })}
 ${quoteBar({ title: `Request service in ${c.name}`, city: c.name })}
-<section class="sec first"><div class="wrap split top">
+<section class="sec first city-intro"><div class="wrap split">
   <div class="prose" data-reveal><h2>Heating and cooling for ${c.name} homes</h2>
     <p>${esc(c.local)}</p>
     <p>Whatever the age of your home, our approach is the same: inspect the equipment, explain what we find and give you practical repair or replacement options with the price up front.</p></div>
@@ -472,8 +495,10 @@ ${['subject', 'issue', 'name', 'phone', 'city', 'page', 'utm_source', 'utm_mediu
 
 const today = new Date().toISOString().slice(0, 10);
 writeFileSync(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.filter((p) => p.sitemap).map((p) => `<url><loc>${abs(p.slug)}</loc><lastmod>${today}</lastmod><priority>${p.priority}</priority></url>`).join('\n')}\n</urlset>\n`);
-writeFileSync(join(out, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /thank-you/\nDisallow: /forms/\n\nSitemap: ${site.url}/sitemap.xml\n`);
-writeFileSync(join(out, '_headers'), `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/app.js\n  Cache-Control: public, max-age=604800\n/img/*\n  Cache-Control: public, max-age=31536000, immutable\n/og.jpg\n  Cache-Control: public, max-age=2592000\n`);
-writeFileSync(join(out, '_redirects'), `/careers/  /contact-us/  301\n/home/  /  301\n/wp-admin/*  /  301\n/wp-login.php  /  301\n/feed/  /  301\n`);
+writeFileSync(join(out, 'robots.txt'), staging
+  ? 'User-agent: *\nDisallow: /\n'
+  : `User-agent: *\nAllow: /\nDisallow: /thank-you/\nDisallow: /forms/\n\nSitemap: ${site.url}/sitemap.xml\n`);
+writeFileSync(join(out, '_headers'), `/*\n${staging ? '  X-Robots-Tag: noindex, nofollow\n' : ''}  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/app.js\n  Cache-Control: public, max-age=604800\n/img/*\n  Cache-Control: public, max-age=31536000, immutable\n/og.jpg\n  Cache-Control: public, max-age=2592000\n`);
+writeFileSync(join(out, '_redirects'), `/careers/  /contact-us/  301\n/home/  /  301\n/wp-admin/*  /  301\n/wp-login.php  /  301\n/feed/  /  301\n${isProd && netlifyHost ? `${netlifyHost}/*  ${site.url}/:splat  301!\n` : ''}`);
 
-console.log(`OK: ${pages.length + 1} páginas en dist/ · CSS ${Math.round(css.length / 1024)} KB · JS ${Math.round(readFileSync(join(out, 'app.js')).length / 1024)} KB`);
+console.log(`OK: ${pages.length + 1} páginas en dist/${staging ? ' · PRUEBAS (noindex)' : ''} · CSS ${Math.round(css.length / 1024)} KB · JS ${Math.round(readFileSync(join(out, 'app.js')).length / 1024)} KB`);

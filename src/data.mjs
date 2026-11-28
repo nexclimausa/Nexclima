@@ -40,6 +40,9 @@ export const site = {
   diagnosticWaived: true,   // si contratan la reparación, solo pagan la reparación
   license: null,            // CONFIRMAR, p. ej. 'TN License #12345'
   warranty: '1-year warranty on new installations, plus the manufacturer’s 5–10 year parts warranty', // confirmado 27-11-2026
+  // Financiación: confirmada por NexClima (28-11-2026). null = no se muestra.
+  // Nunca añadir entidad, TAE, cuotas, plazos ni aprobación sin el dato real.
+  financing: 'Financing options available',
   responseTime: 'the same day', // confirmado 27-11-2026: servicio el mismo día
   // Auditoría H-08: crear service@nexclima.us y ponerlo aquí en lugar del Gmail.
 };
@@ -307,7 +310,7 @@ export const homeFaq = [
   ['Which areas do you serve?', 'La Vergne, Smyrna, Murfreesboro, Nashville, Brentwood, Franklin, Mt. Juliet and Lebanon, and the communities in between.'],
 ];
 
-// CONFIRMAR: las ofertas del sitio actual vencieron en 2023. Edita o vacía esta lista.
+// Ofertas vigentes, confirmadas por NexClima (28-11-2026). Sin fecha de caducidad: no la pongas en la web.
 export const specials = [
   {
     title: 'Precision tune-up',
@@ -322,4 +325,4 @@ export const specials = [
     text: 'Were you told you need a new system? Send us the quote; we’ll check whether a repair still makes sense.',
   },
 ];
-export const specialsConfirmed = false; // true cuando NexClima confirme precios y condiciones
+export const specialsConfirmed = true; // confirmado 28-11-2026 (false = página oculta y con noindex)
